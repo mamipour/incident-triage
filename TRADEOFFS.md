@@ -11,7 +11,7 @@
 - Correlation ID middleware — accepted or generated, echoed in every response header
 - Structured JSON logging with correlation_id on every line
 - In-memory trace store with /debug/trace/{correlation_id}
-- 19 unit tests covering search query building, filter logic, guardrails, prompt injection
+- 25 unit tests covering search query building, filter logic, guardrails, prompt injection
 - README with exact run steps and curl examples for all endpoints
 - generate_data.py with fixed seed (42), 300 incidents pre-generated and committed
 
