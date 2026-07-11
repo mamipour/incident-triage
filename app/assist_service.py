@@ -9,6 +9,7 @@ from typing import Any
 from fastapi import HTTPException
 from fastapi.responses import JSONResponse
 from openai import APIConnectionError, APITimeoutError, OpenAI
+from pydantic import ValidationError
 
 from app.config import get_settings
 from app.guardrails import validate_assist_output
@@ -109,6 +110,21 @@ def call_llm(question: str, incidents: list[dict[str, Any]]) -> tuple[list[Relev
                 {"role": "user", "content": build_user_prompt(question, incidents)},
             ],
         )
+
+        raw_content = response.choices[0].message.content
+        if not raw_content:
+            raise HTTPException(
+                status_code=503,
+                detail={
+                    "error": "LLM service unavailable",
+                    "detail": "LLM returned an empty response. Set LLM_API_KEY. See README.",
+                },
+            )
+
+        payload = parse_llm_response(raw_content)
+        return normalize_llm_payload(payload)
+    except HTTPException:
+        raise
     except (APITimeoutError, APIConnectionError) as exc:
         logger.exception("LLM call failed")
         raise HTTPException(
@@ -116,6 +132,15 @@ def call_llm(question: str, incidents: list[dict[str, Any]]) -> tuple[list[Relev
             detail={
                 "error": "LLM service unavailable",
                 "detail": f"LLM call failed: {exc}. Set LLM_API_KEY. See README.",
+            },
+        ) from exc
+    except (json.JSONDecodeError, ValueError, ValidationError) as exc:
+        logger.exception("LLM response parse failed")
+        raise HTTPException(
+            status_code=503,
+            detail={
+                "error": "LLM service unavailable",
+                "detail": f"LLM returned invalid JSON: {exc}. Set LLM_API_KEY. See README.",
             },
         ) from exc
     except Exception as exc:
@@ -128,19 +153,6 @@ def call_llm(question: str, incidents: list[dict[str, Any]]) -> tuple[list[Relev
             },
         ) from exc
 
-    raw_content = response.choices[0].message.content
-    if not raw_content:
-        raise HTTPException(
-            status_code=503,
-            detail={
-                "error": "LLM service unavailable",
-                "detail": "LLM returned an empty response. Set LLM_API_KEY. See README.",
-            },
-        )
-
-    payload = parse_llm_response(raw_content)
-    return normalize_llm_payload(payload)
-
 
 def run_assist(request: AssistRequest, correlation_id: str) -> AssistResponse | AssistNoResultsResponse:
     search_params = SearchParams(
@@ -150,7 +162,7 @@ def run_assist(request: AssistRequest, correlation_id: str) -> AssistResponse | 
         severity=request.severity,
         tags=request.tags,
     )
-    search_results = search_incidents(search_params)
+    search_results = search_incidents(search_params, fts_operator="OR")
     candidate_ids = [result.id for result in search_results.results]
 
     steps: list[dict[str, object]] = [

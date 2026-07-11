@@ -63,30 +63,56 @@ def ingest_incidents(records: list[IncidentRecord]) -> IngestResponse:
                 skipped += 1
                 continue
 
-            conn.execute(
-                """
-                INSERT OR REPLACE INTO incidents (
-                    id, created_at, environment, service, severity,
-                    title, description, resolution_summary, tags, content_hash
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                """,
-                (
-                    record.id,
-                    record.created_at,
-                    record.environment,
-                    record.service,
-                    record.severity,
-                    record.title,
-                    record.description,
-                    record.resolution_summary,
-                    serialize_tags(record.tags),
-                    content_hash,
-                ),
-            )
-
             if existing is None:
+                conn.execute(
+                    """
+                    INSERT INTO incidents (
+                        id, created_at, environment, service, severity,
+                        title, description, resolution_summary, tags, content_hash
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    """,
+                    (
+                        record.id,
+                        record.created_at,
+                        record.environment,
+                        record.service,
+                        record.severity,
+                        record.title,
+                        record.description,
+                        record.resolution_summary,
+                        serialize_tags(record.tags),
+                        content_hash,
+                    ),
+                )
                 ingested += 1
             else:
+                conn.execute(
+                    """
+                    UPDATE incidents SET
+                        created_at = ?,
+                        environment = ?,
+                        service = ?,
+                        severity = ?,
+                        title = ?,
+                        description = ?,
+                        resolution_summary = ?,
+                        tags = ?,
+                        content_hash = ?
+                    WHERE id = ?
+                    """,
+                    (
+                        record.created_at,
+                        record.environment,
+                        record.service,
+                        record.severity,
+                        record.title,
+                        record.description,
+                        record.resolution_summary,
+                        serialize_tags(record.tags),
+                        content_hash,
+                        record.id,
+                    ),
+                )
                 updated += 1
 
     return IngestResponse(ingested=ingested, skipped=skipped, updated=updated)

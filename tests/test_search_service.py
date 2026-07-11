@@ -10,6 +10,12 @@ def test_build_fts_query_token_and():
     assert build_fts_query("database timeout") == '"database" AND "timeout"'
 
 
+def test_build_fts_query_token_or():
+    assert build_fts_query("database timeout in prod", operator="OR") == (
+        '"database" OR "timeout" OR "in" OR "prod"'
+    )
+
+
 def test_build_fts_query_escapes_quotes():
     assert build_fts_query('foo "bar"') == '"foo" AND """bar"""'
 

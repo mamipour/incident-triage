@@ -2,18 +2,25 @@
 
 from __future__ import annotations
 
+from typing import Literal
+
 from app.db import get_connection, parse_tags
 from app.models import SearchParams, SearchResponse, SearchResultItem
 
 MAX_RESULTS = 10
 SNIPPET_LENGTH = 150
+FtsOperator = Literal["AND", "OR"]
 
 
-def build_fts_query(q: str) -> str:
-    """Build a simple token AND FTS5 query."""
+def build_fts_query(q: str, operator: FtsOperator = "AND") -> str:
+    """Build an FTS5 query joining tokens with AND (search) or OR (assist)."""
     tokens = q.split()
+    if not tokens:
+        return '""'
+
     quoted = [f'"{token.replace('"', '""')}"' for token in tokens]
-    return " AND ".join(quoted)
+    joiner = f" {operator} "
+    return joiner.join(quoted)
 
 
 def _build_filter_clauses(params: SearchParams) -> tuple[list[str], list[object]]:
@@ -50,8 +57,9 @@ def _build_filter_clauses(params: SearchParams) -> tuple[list[str], list[object]
 def search_incidents(
     params: SearchParams,
     limit: int = MAX_RESULTS,
+    fts_operator: FtsOperator = "AND",
 ) -> SearchResponse:
-    fts_query = build_fts_query(params.q)
+    fts_query = build_fts_query(params.q, operator=fts_operator)
     filter_clauses, filter_values = _build_filter_clauses(params)
 
     where_parts = ["incidents_fts MATCH ?"]
