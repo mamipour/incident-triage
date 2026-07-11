@@ -2,6 +2,12 @@
 
 ## How I used AI across the build
 
+Before writing the first prompt, I annotated the original spec into SPECS.md - made every "optional" into a hard decision, resolved all ambiguities, and added explicit design choices (SQLite FTS5, OpenAI only, fixed cap of 10, mandatory trace endpoint). The goal was to remove ambiguity before the agent touched anything, so it never had to guess.
+
+Then a clarify pass: first prompt was questions only, no code. Agent flagged gaps, I answered them all in one shot. Only after that did I ask for PLAN.md.
+
+This is a lightweight spec-driven workflow. Spec first, plan second, code section by section. The agent never ran ahead - every section ended with a hard stop. This is what kept the build reviewable and the mistakes catchable.
+
 Used Cursor Composer 2 for everything: scaffolding all modules, writing unit tests, generating README, and section-by-section implementation. The approach was one section at a time - agent builds it, I review, then commit. No big-bang generation. Each section had a hard stop before moving to the next.
 
 ---
