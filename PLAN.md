@@ -1,0 +1,151 @@
+# Implementation Plan
+
+Checklist for building the incident triage search + AI assistant. Each item maps to a requirement from `SPECS.md` and the agreed design decisions.
+
+---
+
+## Project structure and configuration
+
+- [ ] Create package layout with separate modules for config, ingest, search, assist, observability, and models — **Maintainability: separation of concerns**
+- [ ] Add `app/config.py` using pydantic-settings to load env vars (`LLM_API_KEY`, `LLM_MODEL`, `PORT`, `DATA_PATH`) — **Config via environment variables**
+- [ ] Add `app/main.py` FastAPI app factory with router registration — **Tech: Python (FastAPI)**
+- [ ] Pin runtime dependencies in `requirements.txt` (already scaffolded) — **Maintainability**
+- [ ] Update `.env.example` with OpenAI-only vars (`LLM_API_KEY`, `LLM_MODEL`, `PORT`, `DATA_PATH`) — **Environment variables**
+- [ ] **Commit checkpoint:** project scaffold, config, and dependencies
+
+---
+
+## Data generation
+
+- [ ] Create `generate_data.py` with fixed seed (`SEED = 42`) for repeatable output — **Data: fixed seed**
+- [ ] Generate exactly 300 synthetic incidents with fields: `id`, `created_at`, `environment`, `service`, `severity`, `title`, `description`, `resolution_summary`, `tags` — **Data: 200–500 tickets, required fields**
+- [ ] Use `environment` values from `dev` / `qa` / `stage` / `prod` — **Data: environment enum**
+- [ ] Use `severity` enum: `critical`, `high`, `medium`, `low` — **Design decision: severity enum**
+- [ ] Set `created_at` as ISO 8601 UTC, randomly spread over the last 6 months — **Design decision: created_at format**
+- [ ] Store `tags` as a JSON array of strings — **Data: tags (array)**
+- [ ] Write output to `data/incidents.json` — **Design decision: generate once, write to file**
+- [ ] Skip generation with a message if `data/incidents.json` already exists — **Design decision: skip if file exists**
+- [ ] Pre-generate and commit `data/incidents.json` to the repo — **Design decision: pre-generated and committed**
+- [ ] Document `python generate_data.py` in README (run once if file missing) — **Docs: how to start / ingest prep**
+- [ ] **Commit checkpoint:** data generator and pre-generated incidents
+
+---
+
+## Database and search store
+
+- [ ] Create `app/db.py` (or equivalent) to initialize SQLite with incidents table and FTS5 virtual table — **Search backend: SQLite FTS**
+- [ ] Store full incident records in a primary `incidents` table keyed by `id` — **GET /incidents/{id}: full record**
+- [ ] Add `content_hash` column (SHA-256 of canonical content) for idempotent ingest — **Design decision: hash for skipped vs updated**
+- [ ] Create FTS5 index on `title`, `description`, `resolution_summary` (tags excluded) — **Design decision: FTS fields; tags are filter-only**
+- [ ] Store `tags` as JSON text and filter via `json_each` — **Design decision: tags filtered via json_each**
+- [ ] Wire FTS sync triggers (insert/update/delete) so index stays consistent on ingest — **POST /ingest: loads into search store**
+- [ ] **Commit checkpoint:** SQLite schema, FTS5 index, and sync triggers
+
+---
+
+## Domain models and validation
+
+- [ ] Define Pydantic models for incident record, ingest response, search response, assist request/response, and error payloads — **Robustness: input validation**
+- [ ] Validate `environment`, `service`, `severity`, and comma-separated `tags` on search and assist filters — **GET /search, POST /assist: optional filters**
+- [ ] Reject empty or whitespace-only `q` on `/search` with HTTP 422 — **Design decision: empty q → 422**
+- [ ] Validate `question` on `/assist`: required, max 1000 characters — **POST /assist: question max 1000 chars; Robustness: limits**
+- [ ] **Commit checkpoint:** Pydantic models and input validation
+
+---
+
+## Ingest (`POST /ingest`)
+
+- [ ] Implement ingest service that reads incidents from `DATA_PATH` (default `data/incidents.json`) — **POST /ingest: loads incidents; Design decision: ingest reads file only**
+- [ ] Do not invoke the generator from the ingest endpoint — **Design decision: generator and ingest are separate**
+- [ ] For each incident: lookup by `id`, compare `content_hash`, skip if match — **Idempotent: skipped = same id + same hash**
+- [ ] For changed content: `INSERT OR REPLACE` and increment `updated` — **Idempotent: updated = same id, different content**
+- [ ] For new incidents: insert and increment `ingested` — **POST /ingest: ingested count**
+- [ ] Return `{"ingested": N, "skipped": N, "updated": N}` — **POST /ingest: return counts**
+- [ ] Second run on unchanged data yields all skipped, zero ingested/updated — **Idempotent: no duplicates**
+- [ ] **Commit checkpoint:** idempotent ingest endpoint
+
+---
+
+## Search (`GET /search`)
+
+- [ ] Implement shared search function used by both `/search` and `/assist` — **POST /assist: same search code path**
+- [ ] Build FTS query with simple token AND semantics — **Design decision: FTS token AND**
+- [ ] Apply optional filters (`environment`, `service`, `severity`, `tags`) with AND logic — **GET /search: filters; Design decision: filter AND**
+- [ ] Parse `tags` filter as comma-separated OR match via `json_each` — **Design decision: tags OR, comma-separated**
+- [ ] Return raw FTS5 rank negated so higher score = better match — **Design decision: negated rank score**
+- [ ] Return top 10 results with `id`, `title`, `snippet`, `score` — **GET /search: top 10 results**
+- [ ] Build snippet as first 150 chars of `description`, plain text, no highlighting — **Design decision: snippet rules**
+- [ ] Return total hit count alongside results — **GET /search: total hit count**
+- [ ] Return `{"total": N, "results": [...]}` response shape — **Design decision: search response schema**
+- [ ] **Commit checkpoint:** search endpoint and shared search function
+
+---
+
+## Incident details (`GET /incidents/{id}`)
+
+- [ ] Implement endpoint returning the full stored incident record — **GET /incidents/{id}: full record**
+- [ ] Return 404 with useful error when incident id is not found — **Robustness: useful error messages**
+- [ ] **Commit checkpoint:** incident details endpoint
+
+---
+
+## Assist (`POST /assist`)
+
+- [ ] Accept `question` (required) and optional filters (same as search) — **POST /assist: input**
+- [ ] Add isolated prompt-injection check function (keyword-based) on `question`; return HTTP 422 if triggered — **Robustness: input validation; Design decision: prompt injection guard**
+- [ ] Pass `question` directly as the FTS query (no separate query construction) — **Design decision: question = FTS query**
+- [ ] Retrieve top 10 candidates via the shared search function — **Design decision: candidate pool = 10**
+- [ ] On zero search hits: return HTTP 200 with `"message": "No relevant incidents found. Please refine your question."` and do not call the LLM — **Grounding: nothing relevant; Design decision: zero hits, no LLM**
+- [ ] Call OpenAI with real API at runtime (`temperature=0`, `timeout=30s`, `max_tokens=1000`) — **LLM: OpenAI at runtime; Design decision: LLM params**
+- [ ] Prompt LLM with retrieved incident records framed as data, not instructions; ask it to pick 3–5 relevant IDs with reasons — **POST /assist: 3–5 relevant IDs and why; Design decision: prevent indirect prompt injection**
+- [ ] Return `next_steps` checklist and `customer_draft` short response — **POST /assist: next steps + customer-facing draft**
+- [ ] Return response schema: `relevant_incidents`, `next_steps`, `customer_draft`, `correlation_id` — **Design decision: assist response schema**
+- [ ] When LLM finds no relevant incidents among candidates: return 200 with empty `relevant_incidents` and guidance in `next_steps` — **Design decision: option A**
+- [ ] Enforce grounding via prompt + post-validation (cited IDs must be in candidate set; no fields outside retrieved records) — **Grounding: cite IDs, no invented details**
+- [ ] On LLM failure (missing key, timeout, etc.): return HTTP 503 with `error`, `detail`, `correlation_id` — **Grounding: LLM failure error; Robustness: timeouts**
+- [ ] **Commit checkpoint:** assist endpoint with LLM integration and grounding guardrails
+
+---
+
+## Observability
+
+- [ ] Add middleware to accept or generate `X-Correlation-ID` per request — **Observability: correlation_id per request**
+- [ ] Echo `X-Correlation-ID` on every response — **Design decision: header echoed**
+- [ ] Configure structured JSON logging with `correlation_id` on every log line — **Observability: correlation_id in every log line**
+- [ ] Record `/assist` trace steps: `tool:search` input (query, filters), `tool:search` output (hit count, top IDs), LLM selected IDs — **Observability: assist step list**
+- [ ] Store traces in in-memory dict, max 100 entries, drop oldest on overflow — **Design decision: trace storage**
+- [ ] Implement `GET /debug/trace/{correlation_id}` returning recorded steps — **Observability: debug trace endpoint**
+- [ ] Return 404 for unknown or expired correlation IDs — **Design decision: trace 404**
+- [ ] Use agreed trace payload shape (`correlation_id`, `steps` with `tool:search` and `llm` entries) — **Design decision: trace step format**
+- [ ] **Commit checkpoint:** correlation ID middleware, structured logging, and trace endpoint
+
+---
+
+## Testing
+
+- [ ] Add unit test for search query building (token AND) and filter combination (AND filters, tags OR) — **Testing: query building and filtering**
+- [ ] Add unit test for assist guardrails (cited IDs in candidate set, rejection of invented details) — **Testing: guardrails**
+- [ ] Do not add integration tests — **Testing: integration tests not needed**
+- [ ] **Commit checkpoint:** unit tests
+
+---
+
+## Documentation
+
+- [ ] Write `README.md` with exact steps to install dependencies and start the server — **Docs: how to start**
+- [ ] Add curl example for `POST /ingest` — **Docs: how to ingest**
+- [ ] Add curl example for `GET /search` — **Docs: how to search**
+- [ ] Add curl example for `POST /assist` — **Docs: how to call assist**
+- [ ] Add instructions to run `pytest` — **Docs: how to run tests**
+- [ ] Document all environment variables and LLM setup (`LLM_API_KEY`, etc.) — **Environment variables; Grounding: explain what to set**
+- [ ] **Commit checkpoint:** README and documentation
+
+---
+
+## Final verification
+
+- [ ] Manually verify ingest → search → assist → trace flow end-to-end — **API requirements (all endpoints)**
+- [ ] Confirm idempotent ingest: second run reports all skipped — **POST /ingest: idempotent**
+- [ ] Confirm `/assist` returns 503 with helpful detail when `LLM_API_KEY` is missing — **Grounding: LLM failure error**
+- [ ] Do not create or modify `PROMPTS.md`, `AI-NOTES.md`, or `TRADEOFFS.md` — **SPECS.md: IMPORTANT constraint**
+- [ ] **Commit checkpoint:** final verification pass
