@@ -83,8 +83,8 @@ Checklist for building the incident triage search + AI assistant. Each item maps
 
 ## Incident details (`GET /incidents/{id}`)
 
-- [ ] Implement endpoint returning the full stored incident record — **GET /incidents/{id}: full record**
-- [ ] Return 404 with useful error when incident id is not found — **Robustness: useful error messages**
+- [x] Implement endpoint returning the full stored incident record — **GET /incidents/{id}: full record**
+- [x] Return 404 with useful error when incident id is not found — **Robustness: useful error messages**
 - [ ] **Commit checkpoint:** incident details endpoint
 
 ---

@@ -2,7 +2,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
-from app import assist, ingest, search
+from app import assist, incidents, ingest, search
 from app.config import get_settings
 from app.db import init_db
 
@@ -24,6 +24,7 @@ def create_app() -> FastAPI:
 
     app.include_router(ingest.router)
     app.include_router(search.router)
+    app.include_router(incidents.router)
     app.include_router(assist.router)
 
     @app.get("/health", tags=["health"])
