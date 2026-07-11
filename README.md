@@ -70,7 +70,7 @@ Example response:
 ## Search incidents
 
 ```bash
-curl "http://localhost:8000/search?q=database+timeout&environment=prod&tags=timeout,database"
+curl "http://localhost:8000/search?q=database+timeout&tags=timeout,database"
 ```
 
 Example response:
@@ -81,11 +81,11 @@ Example response:
   "results": [
     {
       "id": "INC-00017",
-      "title": "...",
-      "snippet": "...",
+      "title": "Schema migration timeout on image-resizer database",
+      "snippet": "An online migration against image-resizer in dev held table locks...",
       "score": 1.23,
-      "environment": "prod",
-      "service": "payment-api",
+      "environment": "dev",
+      "service": "image-resizer",
       "severity": "high",
       "tags": ["database", "timeout"]
     }
@@ -118,9 +118,7 @@ curl -X POST http://localhost:8000/assist \
   -H "Content-Type: application/json" \
   -H "X-Correlation-ID: demo-123" \
   -d '{
-    "question": "database connection timeout in prod",
-    "environment": "prod",
-    "severity": "high"
+    "question": "database connection timeout"
   }'
 ```
 

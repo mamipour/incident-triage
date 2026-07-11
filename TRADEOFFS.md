@@ -26,7 +26,7 @@
 
 ## Known issues and risks
 
-- `q=database+timeout&environment=prod` in the README example returns 0 results — the generator cycles scenario and environment in lockstep, so each scenario only appears in 2 of the 4 environments. Those incidents exist in dev/stage, not prod. `q=database+timeout` alone returns 10 results. Would fix by randomizing environment assignment in the generator.
+- Generator cycles scenario and environment in lockstep, so each scenario only appears in 2 of the 4 environments. Some queries with `environment=prod` or `environment=qa` may return 0 even if results exist in dev/stage. Would fix by randomizing environment assignment in the generator.
 - Keyword injection check is bypassable with creative phrasing — acceptable for this scope, documented
 - Trace store is lost on restart — in-memory only
 - No persistent log storage beyond structured stdout
@@ -34,7 +34,7 @@
 ## What I would do next with 2 more hours
 
 - Replace keyword injection check with LLM-based sanitizer
-- Fix the README search example to use an environment that actually has matching data
+- Fix the README examples to use environment-neutral queries (done)
 - Add one integration test for the full /assist flow end-to-end
 
 ## What I would do next with 2 more days
