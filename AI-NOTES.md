@@ -56,6 +56,20 @@ Agent said 'search tests ok' but tests/ was empty - it had run ad-hoc checks in 
 
 ---
 
+**Final review**
+
+Used Cursor (Fable) as a judge, asked it to read the full submission against the original spec and report what's broken, not just what works. Found three real bugs:
+
+- `/assist` doesn't work for natural-language questions. `build_fts_query` does token AND, so anything with a stopword or mismatch returns 0 hits and the LLM never gets called
+- FTS index corrupts on ingest update. `INSERT OR REPLACE` skips the delete trigger, orphans old FTS rows
+- Uncaught 500 if LLM returns malformed JSON. `parse_llm_response` runs outside the try/except
+
+Also caught a wrong diagnosis in TRADEOFFS.md. The zero-result issue on `environment=prod` is a generator correlation bug, not a vocabulary or URL encoding problem.
+
+Fixed all four before submission.
+
+---
+
 **PROMPT #17:**
 
 Spec says 'if nothing relevant is found, say so and ask for more info' as a hard requirement. Agent missed it when writing PLAN.md, I missed it reviewing the plan. Caught it later re-reading the spec. The system prompt handled zero hits in code but never told the LLM what to say when candidates exist but none are relevant. Fixed by adding the explicit instruction to the system prompt.
