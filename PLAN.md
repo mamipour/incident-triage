@@ -132,12 +132,12 @@ Checklist for building the incident triage search + AI assistant. Each item maps
 
 ## Documentation
 
-- [ ] Write `README.md` with exact steps to install dependencies and start the server — **Docs: how to start**
-- [ ] Add curl example for `POST /ingest` — **Docs: how to ingest**
-- [ ] Add curl example for `GET /search` — **Docs: how to search**
-- [ ] Add curl example for `POST /assist` — **Docs: how to call assist**
-- [ ] Add instructions to run `pytest` — **Docs: how to run tests**
-- [ ] Document all environment variables and LLM setup (`LLM_API_KEY`, etc.) — **Environment variables; Grounding: explain what to set**
+- [x] Write `README.md` with exact steps to install dependencies and start the server — **Docs: how to start**
+- [x] Add curl example for `POST /ingest` — **Docs: how to ingest**
+- [x] Add curl example for `GET /search` — **Docs: how to search**
+- [x] Add curl example for `POST /assist` — **Docs: how to call assist**
+- [x] Add instructions to run `pytest` — **Docs: how to run tests**
+- [x] Document all environment variables and LLM setup (`LLM_API_KEY`, etc.) — **Environment variables; Grounding: explain what to set**
 - [ ] **Commit checkpoint:** README and documentation
 
 ---
