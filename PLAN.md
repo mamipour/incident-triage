@@ -33,12 +33,12 @@ Checklist for building the incident triage search + AI assistant. Each item maps
 
 ## Database and search store
 
-- [ ] Create `app/db.py` (or equivalent) to initialize SQLite with incidents table and FTS5 virtual table — **Search backend: SQLite FTS**
-- [ ] Store full incident records in a primary `incidents` table keyed by `id` — **GET /incidents/{id}: full record**
-- [ ] Add `content_hash` column (SHA-256 of canonical content) for idempotent ingest — **Design decision: hash for skipped vs updated**
-- [ ] Create FTS5 index on `title`, `description`, `resolution_summary` (tags excluded) — **Design decision: FTS fields; tags are filter-only**
-- [ ] Store `tags` as JSON text and filter via `json_each` — **Design decision: tags filtered via json_each**
-- [ ] Wire FTS sync triggers (insert/update/delete) so index stays consistent on ingest — **POST /ingest: loads into search store**
+- [x] Create `app/db.py` (or equivalent) to initialize SQLite with incidents table and FTS5 virtual table — **Search backend: SQLite FTS**
+- [x] Store full incident records in a primary `incidents` table keyed by `id` — **GET /incidents/{id}: full record**
+- [x] Add `content_hash` column (SHA-256 of canonical content) for idempotent ingest — **Design decision: hash for skipped vs updated**
+- [x] Create FTS5 index on `title`, `description`, `resolution_summary` (tags excluded) — **Design decision: FTS fields; tags are filter-only**
+- [x] Store `tags` as JSON text and filter via `json_each` — **Design decision: tags filtered via json_each**
+- [x] Wire FTS sync triggers (insert/update/delete) so index stays consistent on ingest — **POST /ingest: loads into search store**
 - [ ] **Commit checkpoint:** SQLite schema, FTS5 index, and sync triggers
 
 ---

@@ -8,6 +8,7 @@ class Settings(BaseSettings):
     llm_model: str = "gpt-4o-mini"
     port: int = 8000
     data_path: str = "data/incidents.json"
+    database_path: str = "data/incidents.db"
 
     model_config = SettingsConfigDict(
         env_file=".env",

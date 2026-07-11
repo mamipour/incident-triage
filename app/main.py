@@ -1,7 +1,16 @@
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 
 from app import assist, ingest, search
 from app.config import get_settings
+from app.db import init_db
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    init_db()
+    yield
 
 
 def create_app() -> FastAPI:
@@ -10,6 +19,7 @@ def create_app() -> FastAPI:
         title="Incident Triage",
         description="Search and AI assistant for incident triage",
         version="0.1.0",
+        lifespan=lifespan,
     )
 
     app.include_router(ingest.router)
