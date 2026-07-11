@@ -55,13 +55,13 @@ Checklist for building the incident triage search + AI assistant. Each item maps
 
 ## Ingest (`POST /ingest`)
 
-- [ ] Implement ingest service that reads incidents from `DATA_PATH` (default `data/incidents.json`) — **POST /ingest: loads incidents; Design decision: ingest reads file only**
-- [ ] Do not invoke the generator from the ingest endpoint — **Design decision: generator and ingest are separate**
-- [ ] For each incident: lookup by `id`, compare `content_hash`, skip if match — **Idempotent: skipped = same id + same hash**
-- [ ] For changed content: `INSERT OR REPLACE` and increment `updated` — **Idempotent: updated = same id, different content**
-- [ ] For new incidents: insert and increment `ingested` — **POST /ingest: ingested count**
-- [ ] Return `{"ingested": N, "skipped": N, "updated": N}` — **POST /ingest: return counts**
-- [ ] Second run on unchanged data yields all skipped, zero ingested/updated — **Idempotent: no duplicates**
+- [x] Implement ingest service that reads incidents from `DATA_PATH` (default `data/incidents.json`) — **POST /ingest: loads incidents; Design decision: ingest reads file only**
+- [x] Do not invoke the generator from the ingest endpoint — **Design decision: generator and ingest are separate**
+- [x] For each incident: lookup by `id`, compare `content_hash`, skip if match — **Idempotent: skipped = same id + same hash**
+- [x] For changed content: `INSERT OR REPLACE` and increment `updated` — **Idempotent: updated = same id, different content**
+- [x] For new incidents: insert and increment `ingested` — **POST /ingest: ingested count**
+- [x] Return `{"ingested": N, "skipped": N, "updated": N}` — **POST /ingest: return counts**
+- [x] Second run on unchanged data yields all skipped, zero ingested/updated — **Idempotent: no duplicates**
 - [ ] **Commit checkpoint:** idempotent ingest endpoint
 
 ---
