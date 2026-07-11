@@ -70,4 +70,10 @@ Used Cursor (Fable) as a judge, asked it to read the full submission against the
 - FTS index corrupts on ingest update. `INSERT OR REPLACE` skips the delete trigger, orphans old FTS rows
 - Uncaught 500 if LLM returns malformed JSON. `parse_llm_response` runs outside the try/except
 
-Fixed all four before submission.
+Fixed all three code bugs and corrected the TRADEOFFS diagnosis before submission.
+
+---
+
+**Documentation**
+
+Used AI to help format and structure the documentation files (PROMPTS.md, AI-NOTES.md, TRADEOFFS.md). The content and decisions are mine — the agent formatted them into markdown and kept my language. I reviewed and approved everything before committing.
