@@ -6,11 +6,11 @@ Checklist for building the incident triage search + AI assistant. Each item maps
 
 ## Project structure and configuration
 
-- [ ] Create package layout with separate modules for config, ingest, search, assist, observability, and models — **Maintainability: separation of concerns**
-- [ ] Add `app/config.py` using pydantic-settings to load env vars (`LLM_API_KEY`, `LLM_MODEL`, `PORT`, `DATA_PATH`) — **Config via environment variables**
-- [ ] Add `app/main.py` FastAPI app factory with router registration — **Tech: Python (FastAPI)**
-- [ ] Pin runtime dependencies in `requirements.txt` (already scaffolded) — **Maintainability**
-- [ ] Update `.env.example` with OpenAI-only vars (`LLM_API_KEY`, `LLM_MODEL`, `PORT`, `DATA_PATH`) — **Environment variables**
+- [x] Create package layout with separate modules for config, ingest, search, assist, observability, and models — **Maintainability: separation of concerns**
+- [x] Add `app/config.py` using pydantic-settings to load env vars (`LLM_API_KEY`, `LLM_MODEL`, `PORT`, `DATA_PATH`) — **Config via environment variables**
+- [x] Add `app/main.py` FastAPI app factory with router registration — **Tech: Python (FastAPI)**
+- [x] Pin runtime dependencies in `requirements.txt` (already scaffolded) — **Maintainability**
+- [x] Update `.env.example` with OpenAI-only vars (`LLM_API_KEY`, `LLM_MODEL`, `PORT`, `DATA_PATH`) — **Environment variables**
 - [ ] **Commit checkpoint:** project scaffold, config, and dependencies
 
 ---
