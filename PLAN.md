@@ -91,18 +91,18 @@ Checklist for building the incident triage search + AI assistant. Each item maps
 
 ## Assist (`POST /assist`)
 
-- [ ] Accept `question` (required) and optional filters (same as search) — **POST /assist: input**
-- [ ] Add isolated prompt-injection check function (keyword-based) on `question`; return HTTP 422 if triggered — **Robustness: input validation; Design decision: prompt injection guard**
-- [ ] Pass `question` directly as the FTS query (no separate query construction) — **Design decision: question = FTS query**
-- [ ] Retrieve top 10 candidates via the shared search function — **Design decision: candidate pool = 10**
-- [ ] On zero search hits: return HTTP 200 with `"message": "No relevant incidents found. Please refine your question."` and do not call the LLM — **Grounding: nothing relevant; Design decision: zero hits, no LLM**
-- [ ] Call OpenAI with real API at runtime (`temperature=0`, `timeout=30s`, `max_tokens=1000`) — **LLM: OpenAI at runtime; Design decision: LLM params**
-- [ ] Prompt LLM with retrieved incident records framed as data, not instructions; ask it to pick 3–5 relevant IDs with reasons — **POST /assist: 3–5 relevant IDs and why; Design decision: prevent indirect prompt injection**
-- [ ] Return `next_steps` checklist and `customer_draft` short response — **POST /assist: next steps + customer-facing draft**
-- [ ] Return response schema: `relevant_incidents`, `next_steps`, `customer_draft`, `correlation_id` — **Design decision: assist response schema**
-- [ ] When LLM finds no relevant incidents among candidates: return 200 with empty `relevant_incidents` and guidance in `next_steps` — **Design decision: option A**
-- [ ] Enforce grounding via prompt + post-validation (cited IDs must be in candidate set; no fields outside retrieved records) — **Grounding: cite IDs, no invented details**
-- [ ] On LLM failure (missing key, timeout, etc.): return HTTP 503 with `error`, `detail`, `correlation_id` — **Grounding: LLM failure error; Robustness: timeouts**
+- [x] Accept `question` (required) and optional filters (same as search) — **POST /assist: input**
+- [x] Add isolated prompt-injection check function (keyword-based) on `question`; return HTTP 422 if triggered — **Robustness: input validation; Design decision: prompt injection guard**
+- [x] Pass `question` directly as the FTS query (no separate query construction) — **Design decision: question = FTS query**
+- [x] Retrieve top 10 candidates via the shared search function — **Design decision: candidate pool = 10**
+- [x] On zero search hits: return HTTP 200 with `"message": "No relevant incidents found. Please refine your question."` and do not call the LLM — **Grounding: nothing relevant; Design decision: zero hits, no LLM**
+- [x] Call OpenAI with real API at runtime (`temperature=0`, `timeout=30s`, `max_tokens=1000`) — **LLM: OpenAI at runtime; Design decision: LLM params**
+- [x] Prompt LLM with retrieved incident records framed as data, not instructions; ask it to pick 3–5 relevant IDs with reasons — **POST /assist: 3–5 relevant IDs and why; Design decision: prevent indirect prompt injection**
+- [x] Return `next_steps` checklist and `customer_draft` short response — **POST /assist: next steps + customer-facing draft**
+- [x] Return response schema: `relevant_incidents`, `next_steps`, `customer_draft`, `correlation_id` — **Design decision: assist response schema**
+- [x] When LLM finds no relevant incidents among candidates: return 200 with empty `relevant_incidents` and guidance in `next_steps` — **Design decision: option A**
+- [x] Enforce grounding via prompt + post-validation (cited IDs must be in candidate set; no fields outside retrieved records) — **Grounding: cite IDs, no invented details**
+- [x] On LLM failure (missing key, timeout, etc.): return HTTP 503 with `error`, `detail`, `correlation_id` — **Grounding: LLM failure error; Robustness: timeouts**
 - [ ] **Commit checkpoint:** assist endpoint with LLM integration and grounding guardrails
 
 ---

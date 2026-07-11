@@ -6,6 +6,23 @@ from app.models import IncidentRecord
 router = APIRouter(tags=["incidents"])
 
 
+def get_incidents_by_ids(incident_ids: list[str]) -> list[IncidentRecord]:
+    if not incident_ids:
+        return []
+
+    placeholders = ", ".join("?" for _ in incident_ids)
+    with get_connection() as conn:
+        rows = conn.execute(
+            f"SELECT * FROM incidents WHERE id IN ({placeholders})",
+            incident_ids,
+        ).fetchall()
+
+    records_by_id = {
+        row["id"]: IncidentRecord.model_validate(row_to_incident(row)) for row in rows
+    }
+    return [records_by_id[incident_id] for incident_id in incident_ids if incident_id in records_by_id]
+
+
 def get_incident_by_id(incident_id: str) -> IncidentRecord:
     with get_connection() as conn:
         row = conn.execute(
