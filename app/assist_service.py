@@ -21,6 +21,7 @@ from app.models import (
     RelevantIncident,
     SearchParams,
 )
+from app.observability import build_search_filters, save_trace
 from app.search_service import search_incidents
 
 logger = logging.getLogger(__name__)
@@ -150,49 +151,73 @@ def run_assist(request: AssistRequest, correlation_id: str) -> AssistResponse | 
         tags=request.tags,
     )
     search_results = search_incidents(search_params)
-
-    if search_results.total == 0:
-        return AssistNoResultsResponse(
-            message="No relevant incidents found. Please refine your question.",
-        )
-
     candidate_ids = [result.id for result in search_results.results]
-    incidents = get_incidents_by_ids(candidate_ids)
-    incident_payload = [incident.model_dump() for incident in incidents]
-    candidate_id_set = set(candidate_ids)
 
-    for attempt in range(2):
-        relevant_incidents, next_steps, customer_draft = call_llm(
-            request.question,
-            incident_payload,
-        )
-        validation_errors = validate_assist_output(
-            relevant_incidents,
-            next_steps,
-            customer_draft,
-            candidate_id_set,
-        )
-        if not validation_errors:
-            return AssistResponse(
-                relevant_incidents=relevant_incidents,
-                next_steps=next_steps,
-                customer_draft=customer_draft,
-                correlation_id=correlation_id,
+    steps: list[dict[str, object]] = [
+        {
+            "step": "tool:search",
+            "input": {
+                "query": request.question,
+                "filters": build_search_filters(request.model_dump()),
+            },
+            "output": {
+                "hit_count": search_results.total,
+                "top_ids": candidate_ids,
+            },
+        }
+    ]
+
+    try:
+        if search_results.total == 0:
+            return AssistNoResultsResponse(
+                message="No relevant incidents found. Please refine your question.",
             )
-        logger.warning(
-            "Assist output failed guardrails",
-            extra={"correlation_id": correlation_id, "errors": validation_errors, "attempt": attempt + 1},
-        )
 
-    return AssistResponse(
-        relevant_incidents=[],
-        next_steps=[
-            "Review the question and try narrowing environment, service, or severity filters.",
-            "The assistant could not produce a grounded answer from the retrieved incidents.",
-        ],
-        customer_draft="",
-        correlation_id=correlation_id,
-    )
+        incidents = get_incidents_by_ids(candidate_ids)
+        incident_payload = [incident.model_dump() for incident in incidents]
+        candidate_id_set = set(candidate_ids)
+
+        for attempt in range(2):
+            relevant_incidents, next_steps, customer_draft = call_llm(
+                request.question,
+                incident_payload,
+            )
+            validation_errors = validate_assist_output(
+                relevant_incidents,
+                next_steps,
+                customer_draft,
+                candidate_id_set,
+            )
+            if not validation_errors:
+                steps.append(
+                    {
+                        "step": "llm",
+                        "selected_ids": [item.id for item in relevant_incidents],
+                    }
+                )
+                return AssistResponse(
+                    relevant_incidents=relevant_incidents,
+                    next_steps=next_steps,
+                    customer_draft=customer_draft,
+                    correlation_id=correlation_id,
+                )
+            logger.warning(
+                "Assist output failed guardrails",
+                extra={"correlation_id": correlation_id, "errors": validation_errors, "attempt": attempt + 1},
+            )
+
+        steps.append({"step": "llm", "selected_ids": []})
+        return AssistResponse(
+            relevant_incidents=[],
+            next_steps=[
+                "Review the question and try narrowing environment, service, or severity filters.",
+                "The assistant could not produce a grounded answer from the retrieved incidents.",
+            ],
+            customer_draft="",
+            correlation_id=correlation_id,
+        )
+    finally:
+        save_trace(correlation_id, steps)
 
 
 def llm_error_response(exc: HTTPException, correlation_id: str) -> JSONResponse:

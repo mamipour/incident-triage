@@ -109,14 +109,14 @@ Checklist for building the incident triage search + AI assistant. Each item maps
 
 ## Observability
 
-- [ ] Add middleware to accept or generate `X-Correlation-ID` per request — **Observability: correlation_id per request**
-- [ ] Echo `X-Correlation-ID` on every response — **Design decision: header echoed**
-- [ ] Configure structured JSON logging with `correlation_id` on every log line — **Observability: correlation_id in every log line**
-- [ ] Record `/assist` trace steps: `tool:search` input (query, filters), `tool:search` output (hit count, top IDs), LLM selected IDs — **Observability: assist step list**
-- [ ] Store traces in in-memory dict, max 100 entries, drop oldest on overflow — **Design decision: trace storage**
-- [ ] Implement `GET /debug/trace/{correlation_id}` returning recorded steps — **Observability: debug trace endpoint**
-- [ ] Return 404 for unknown or expired correlation IDs — **Design decision: trace 404**
-- [ ] Use agreed trace payload shape (`correlation_id`, `steps` with `tool:search` and `llm` entries) — **Design decision: trace step format**
+- [x] Add middleware to accept or generate `X-Correlation-ID` per request — **Observability: correlation_id per request**
+- [x] Echo `X-Correlation-ID` on every response — **Design decision: header echoed**
+- [x] Configure structured JSON logging with `correlation_id` on every log line — **Observability: correlation_id in every log line**
+- [x] Record `/assist` trace steps: `tool:search` input (query, filters), `tool:search` output (hit count, top IDs), LLM selected IDs — **Observability: assist step list**
+- [x] Store traces in in-memory dict, max 100 entries, drop oldest on overflow — **Design decision: trace storage**
+- [x] Implement `GET /debug/trace/{correlation_id}` returning recorded steps — **Observability: debug trace endpoint**
+- [x] Return 404 for unknown or expired correlation IDs — **Design decision: trace 404**
+- [x] Use agreed trace payload shape (`correlation_id`, `steps` with `tool:search` and `llm` entries) — **Design decision: trace step format**
 - [ ] **Commit checkpoint:** correlation ID middleware, structured logging, and trace endpoint
 
 ---
