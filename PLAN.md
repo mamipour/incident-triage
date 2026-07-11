@@ -68,15 +68,15 @@ Checklist for building the incident triage search + AI assistant. Each item maps
 
 ## Search (`GET /search`)
 
-- [ ] Implement shared search function used by both `/search` and `/assist` — **POST /assist: same search code path**
-- [ ] Build FTS query with simple token AND semantics — **Design decision: FTS token AND**
-- [ ] Apply optional filters (`environment`, `service`, `severity`, `tags`) with AND logic — **GET /search: filters; Design decision: filter AND**
-- [ ] Parse `tags` filter as comma-separated OR match via `json_each` — **Design decision: tags OR, comma-separated**
-- [ ] Return raw FTS5 rank negated so higher score = better match — **Design decision: negated rank score**
-- [ ] Return top 10 results with `id`, `title`, `snippet`, `score` — **GET /search: top 10 results**
-- [ ] Build snippet as first 150 chars of `description`, plain text, no highlighting — **Design decision: snippet rules**
-- [ ] Return total hit count alongside results — **GET /search: total hit count**
-- [ ] Return `{"total": N, "results": [...]}` response shape — **Design decision: search response schema**
+- [x] Implement shared search function used by both `/search` and `/assist` — **POST /assist: same search code path**
+- [x] Build FTS query with simple token AND semantics — **Design decision: FTS token AND**
+- [x] Apply optional filters (`environment`, `service`, `severity`, `tags`) with AND logic — **GET /search: filters; Design decision: filter AND**
+- [x] Parse `tags` filter as comma-separated OR match via `json_each` — **Design decision: tags OR, comma-separated**
+- [x] Return raw FTS5 rank negated so higher score = better match — **Design decision: negated rank score**
+- [x] Return top 10 results with `id`, `title`, `snippet`, `score` — **GET /search: top 10 results**
+- [x] Build snippet as first 150 chars of `description`, plain text, no highlighting — **Design decision: snippet rules**
+- [x] Return total hit count alongside results — **GET /search: total hit count**
+- [x] Return `{"total": N, "results": [...]}` response shape — **Design decision: search response schema**
 - [ ] **Commit checkpoint:** search endpoint and shared search function
 
 ---

@@ -9,6 +9,7 @@ from app.models import (
     TagsQuery,
     parse_tags_filter,
 )
+from app.search_service import search_incidents
 
 router = APIRouter(tags=["search"])
 
@@ -55,4 +56,4 @@ def get_search_params(
 
 @router.get("/search", response_model=SearchResponse)
 def search(params: SearchParams = Depends(get_search_params)) -> SearchResponse:
-    raise HTTPException(status_code=501, detail="Search not implemented yet")
+    return search_incidents(params)
