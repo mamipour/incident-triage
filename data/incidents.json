@@ -1,0 +1,4795 @@
+[
+  {
+    "id": "INC-00001",
+    "created_at": "2026-06-02T11:52:32Z",
+    "environment": "dev",
+    "service": "payment-api",
+    "severity": "critical",
+    "title": "payment-api returning 503 errors in dev",
+    "description": "Users reported widespread failures when calling payment-api. Error rate spiked to 6% in dev. Logs show upstream connection timeouts and circuit breaker trips.",
+    "resolution_summary": "Scaled payment-api replicas and restarted unhealthy pods. Root cause was connection pool exhaustion under peak load.",
+    "tags": [
+      "api",
+      "disk",
+      "error-rate",
+      "timeout"
+    ]
+  },
+  {
+    "id": "INC-00002",
+    "created_at": "2026-06-01T12:12:16Z",
+    "environment": "qa",
+    "service": "user-auth",
+    "severity": "high",
+    "title": "Database connection pool exhausted on user-auth",
+    "description": "Monitoring alerted on user-auth in qa: all database connections in use. Queries queued and request latency exceeded 30 seconds.",
+    "resolution_summary": "Increased pool size and terminated long-running queries. Added index on hot table to reduce lock contention.",
+    "tags": [
+      "database",
+      "latency",
+      "timeout"
+    ]
+  },
+  {
+    "id": "INC-00003",
+    "created_at": "2026-04-01T10:17:53Z",
+    "environment": "stage",
+    "service": "notification-service",
+    "severity": "critical",
+    "title": "Authentication failures after notification-service deploy",
+    "description": "Following a deployment to stage, notification-service began rejecting valid tokens. Login success rate dropped sharply across regions.",
+    "resolution_summary": "Rolled back the deployment and rotated signing keys. Updated config validation to catch mismatched issuer URLs.",
+    "tags": [
+      "auth",
+      "config",
+      "deployment"
+    ]
+  },
+  {
+    "id": "INC-00004",
+    "created_at": "2026-02-20T22:55:36Z",
+    "environment": "prod",
+    "service": "inventory-db",
+    "severity": "critical",
+    "title": "Memory leak detected in inventory-db (prod)",
+    "description": "Heap usage on inventory-db climbed steadily over 48 hours in prod. OOM kills restarted pods every few hours.",
+    "resolution_summary": "Identified unclosed cache entries in recent release. Hotfixed memory cleanup and scheduled full redeploy.",
+    "tags": [
+      "api",
+      "deployment",
+      "memory"
+    ]
+  },
+  {
+    "id": "INC-00005",
+    "created_at": "2026-02-17T02:39:02Z",
+    "environment": "dev",
+    "service": "checkout-frontend",
+    "severity": "critical",
+    "title": "Redis cache miss storm impacting checkout-frontend",
+    "description": "checkout-frontend in dev experienced a cache stampede after TTL expiry. Database load surged and p99 latency degraded.",
+    "resolution_summary": "Enabled request coalescing and staggered cache TTLs. Warmed critical keys before peak traffic.",
+    "tags": [
+      "cache",
+      "database",
+      "failover",
+      "latency",
+      "storage"
+    ]
+  },
+  {
+    "id": "INC-00006",
+    "created_at": "2026-04-06T17:27:57Z",
+    "environment": "qa",
+    "service": "order-processor",
+    "severity": "low",
+    "title": "SSL certificate expiry on order-processor load balancer",
+    "description": "Clients could not reach order-processor in qa due to an expired TLS certificate on the load balancer.",
+    "resolution_summary": "Renewed certificate and updated auto-renewal alerts. Verified chain trust across all edge nodes.",
+    "tags": [
+      "config",
+      "error-rate",
+      "networking",
+      "saturation",
+      "ssl"
+    ]
+  },
+  {
+    "id": "INC-00007",
+    "created_at": "2026-05-25T01:33:55Z",
+    "environment": "stage",
+    "service": "search-indexer",
+    "severity": "critical",
+    "title": "Message queue backlog on search-indexer",
+    "description": "Consumer lag on search-indexer in stage exceeded one million messages. Downstream order processing stalled.",
+    "resolution_summary": "Scaled consumer workers and replayed dead-letter queue. Fixed poison message handler that blocked partition reads.",
+    "tags": [
+      "config",
+      "error-rate",
+      "latency",
+      "queue"
+    ]
+  },
+  {
+    "id": "INC-00008",
+    "created_at": "2026-02-20T07:26:05Z",
+    "environment": "prod",
+    "service": "analytics-pipeline",
+    "severity": "medium",
+    "title": "Rate limiting misconfiguration on analytics-pipeline",
+    "description": "Legitimate traffic to analytics-pipeline in prod was throttled after a config change lowered rate limits too aggressively.",
+    "resolution_summary": "Restored previous rate limit thresholds and added staged rollout for gateway policy updates.",
+    "tags": [
+      "api",
+      "config",
+      "deployment",
+      "rate-limit"
+    ]
+  },
+  {
+    "id": "INC-00009",
+    "created_at": "2026-01-28T06:43:51Z",
+    "environment": "dev",
+    "service": "cdn-edge",
+    "severity": "critical",
+    "title": "Disk space critical on cdn-edge nodes",
+    "description": "Several cdn-edge hosts in dev reached 98% disk usage. Log rotation failed and write operations began failing.",
+    "resolution_summary": "Expanded volumes and purged stale audit logs. Tuned log retention and added disk usage alerts.",
+    "tags": [
+      "deployment",
+      "disk",
+      "error-rate",
+      "incident-response"
+    ]
+  },
+  {
+    "id": "INC-00010",
+    "created_at": "2026-03-01T20:45:23Z",
+    "environment": "qa",
+    "service": "billing-service",
+    "severity": "medium",
+    "title": "Intermittent network partition affecting billing-service",
+    "description": "billing-service in qa lost connectivity to a dependency zone for 12 minutes. Retries caused retry storms across services.",
+    "resolution_summary": "Network team restored BGP routing. Added jittered backoff and bulkhead isolation between dependency calls.",
+    "tags": [
+      "api",
+      "networking",
+      "timeout"
+    ]
+  },
+  {
+    "id": "INC-00011",
+    "created_at": "2026-02-02T17:43:55Z",
+    "environment": "stage",
+    "service": "support-portal",
+    "severity": "low",
+    "title": "DNS resolution failures for support-portal in stage",
+    "description": "Internal clients failed to resolve the support-portal hostname in stage. Resolver timeouts caused cascading health check failures across dependent services.",
+    "resolution_summary": "Fixed stale NS records and reduced negative cache TTL. Added synthetic DNS probes to catch resolver drift early.",
+    "tags": [
+      "api",
+      "dns",
+      "monitoring",
+      "networking"
+    ]
+  },
+  {
+    "id": "INC-00012",
+    "created_at": "2026-05-09T14:30:39Z",
+    "environment": "prod",
+    "service": "mobile-backend",
+    "severity": "medium",
+    "title": "Pod crash loop on mobile-backend after config rollout",
+    "description": "mobile-backend pods in prod entered CrashLoopBackOff after a config map update. Startup probes never passed and traffic shift stalled at 45% capacity.",
+    "resolution_summary": "Reverted config map and patched invalid environment variable references. Added schema validation to the deploy pipeline.",
+    "tags": [
+      "config",
+      "deployment",
+      "kubernetes",
+      "secrets"
+    ]
+  },
+  {
+    "id": "INC-00013",
+    "created_at": "2026-01-18T09:33:25Z",
+    "environment": "dev",
+    "service": "fraud-detection",
+    "severity": "high",
+    "title": "Third-party API outage blocking fraud-detection",
+    "description": "fraud-detection in dev depends on an external vendor API that returned sustained 502 responses. Fallback logic did not activate and checkout flows failed.",
+    "resolution_summary": "Enabled degraded-mode responses and cached last-known-good data. Opened vendor ticket and documented failover runbook steps.",
+    "tags": [
+      "api",
+      "failover",
+      "latency",
+      "rollback",
+      "third-party"
+    ]
+  },
+  {
+    "id": "INC-00014",
+    "created_at": "2026-06-24T14:04:10Z",
+    "environment": "qa",
+    "service": "recommendation-engine",
+    "severity": "medium",
+    "title": "Suspected data corruption in recommendation-engine records",
+    "description": "Support escalations reported inconsistent account states served by recommendation-engine in qa. Audit sampling found mismatched version fields on 10% of recent writes.",
+    "resolution_summary": "Paused write path, restored from point-in-time backup, and replayed events through a repaired serializer.",
+    "tags": [
+      "data-corruption",
+      "database",
+      "rollback"
+    ]
+  },
+  {
+    "id": "INC-00015",
+    "created_at": "2026-03-04T11:27:03Z",
+    "environment": "stage",
+    "service": "webhook-dispatcher",
+    "severity": "critical",
+    "title": "DDoS traffic spike targeting webhook-dispatcher",
+    "description": "Edge metrics showed a 29\u00d7 increase in anonymous requests against webhook-dispatcher in stage. Origin CPU saturated and legitimate users saw elevated error rates.",
+    "resolution_summary": "Activated WAF rules and geo-fenced suspicious ASNs. Scaled edge capacity and enabled challenge mode for abusive IPs.",
+    "tags": [
+      "ddos",
+      "graphql",
+      "networking",
+      "saturation"
+    ]
+  },
+  {
+    "id": "INC-00016",
+    "created_at": "2026-03-22T09:10:06Z",
+    "environment": "prod",
+    "service": "audit-logger",
+    "severity": "medium",
+    "title": "Feature flag misconfiguration in audit-logger",
+    "description": "A flag rollout enabled experimental code for all tenants on audit-logger in prod. Error dashboards spiked within minutes of the change.",
+    "resolution_summary": "Disabled the flag globally and restricted future rollouts to canary cohorts with automatic rollback thresholds.",
+    "tags": [
+      "auth",
+      "config",
+      "deployment",
+      "error-rate"
+    ]
+  },
+  {
+    "id": "INC-00017",
+    "created_at": "2026-05-07T18:45:22Z",
+    "environment": "dev",
+    "service": "image-resizer",
+    "severity": "medium",
+    "title": "Schema migration timeout on image-resizer database",
+    "description": "An online migration against image-resizer in dev held table locks for over 20 minutes. Write traffic blocked and support tickets increased sharply.",
+    "resolution_summary": "Cancelled migration, applied changes in smaller batches, and scheduled remaining steps during a maintenance window.",
+    "tags": [
+      "cron",
+      "database",
+      "latency",
+      "migration",
+      "networking"
+    ]
+  },
+  {
+    "id": "INC-00018",
+    "created_at": "2026-04-09T06:17:19Z",
+    "environment": "qa",
+    "service": "subscription-manager",
+    "severity": "high",
+    "title": "Log pipeline drop causing blind spots for subscription-manager",
+    "description": "Log shipping from subscription-manager in qa fell to near zero. On-call engineers lost visibility while customer-impacting errors continued.",
+    "resolution_summary": "Restarted log agents and increased buffer limits. Added alerts on ingest rate anomalies per service.",
+    "tags": [
+      "disk",
+      "latency",
+      "monitoring",
+      "queue"
+    ]
+  },
+  {
+    "id": "INC-00019",
+    "created_at": "2026-06-22T03:58:28Z",
+    "environment": "stage",
+    "service": "geo-routing-service",
+    "severity": "high",
+    "title": "Cold start latency regression on geo-routing-service",
+    "description": "Serverless instances of geo-routing-service in stage took up to 12 seconds to become ready. Autoscaling added capacity too slowly during a traffic burst.",
+    "resolution_summary": "Pre-warmed minimum instances and trimmed startup dependencies. Tuned autoscaling signals to react on queue depth.",
+    "tags": [
+      "deployment",
+      "latency",
+      "saturation"
+    ]
+  },
+  {
+    "id": "INC-00020",
+    "created_at": "2026-06-14T19:47:07Z",
+    "environment": "prod",
+    "service": "document-parser",
+    "severity": "high",
+    "title": "Webhook delivery failures from document-parser",
+    "description": "document-parser in prod failed to deliver outbound webhooks after TLS cipher policy tightened. Partner integrations missed 7% of expected callbacks.",
+    "resolution_summary": "Restored compatible cipher suites and retried failed deliveries from the dead-letter store with idempotency keys.",
+    "tags": [
+      "config",
+      "ssl",
+      "third-party",
+      "webhook"
+    ]
+  },
+  {
+    "id": "INC-00021",
+    "created_at": "2026-02-19T11:15:04Z",
+    "environment": "dev",
+    "service": "metrics-collector",
+    "severity": "medium",
+    "title": "Session store unavailable for metrics-collector",
+    "description": "Users were logged out repeatedly from metrics-collector in dev. Session cluster nodes reported split-brain and rejected writes.",
+    "resolution_summary": "Forced quorum recovery, rebuilt replica set, and extended session TTL temporarily while caches repopulated.",
+    "tags": [
+      "auth",
+      "cache",
+      "failover",
+      "ssl",
+      "third-party"
+    ]
+  },
+  {
+    "id": "INC-00022",
+    "created_at": "2026-03-27T07:46:41Z",
+    "environment": "qa",
+    "service": "feature-flags-service",
+    "severity": "high",
+    "title": "CDN cache serving stale assets for feature-flags-service",
+    "description": "Customers saw outdated UI assets from feature-flags-service in qa. CDN purge jobs failed silently and edge nodes kept old bundles.",
+    "resolution_summary": "Issued manual global purge and fixed purge API credentials. Added post-deploy verification of asset hashes.",
+    "tags": [
+      "cache",
+      "config",
+      "ddos",
+      "deployment",
+      "networking"
+    ]
+  },
+  {
+    "id": "INC-00023",
+    "created_at": "2026-02-26T09:22:02Z",
+    "environment": "stage",
+    "service": "session-store",
+    "severity": "medium",
+    "title": "Scheduled cron job failed on session-store",
+    "description": "A nightly reconciliation job for session-store in stage did not run for three days. Billing adjustments backlog grew to 13 thousand records.",
+    "resolution_summary": "Re-enabled cron scheduler after token expiry fix and backfilled missed runs with throttled batch workers.",
+    "tags": [
+      "cron",
+      "error-rate",
+      "latency",
+      "queue",
+      "webhook"
+    ]
+  },
+  {
+    "id": "INC-00024",
+    "created_at": "2026-03-28T01:20:28Z",
+    "environment": "prod",
+    "service": "email-gateway",
+    "severity": "low",
+    "title": "Secrets rotation broke email-gateway credentials",
+    "description": "Automated secret rotation updated database credentials for email-gateway in prod but running pods kept stale values. Connection errors spiked across all zones.",
+    "resolution_summary": "Triggered rolling restart after rotation and wired secret reload hooks into the deployment controller.",
+    "tags": [
+      "database",
+      "deployment",
+      "error-rate",
+      "secrets"
+    ]
+  },
+  {
+    "id": "INC-00025",
+    "created_at": "2026-04-15T07:57:01Z",
+    "environment": "dev",
+    "service": "payment-api",
+    "severity": "high",
+    "title": "GraphQL N+1 query storm on payment-api",
+    "description": "A new client release issued deeply nested GraphQL queries against payment-api in dev. Database CPU hit 37% and API latency exceeded SLOs.",
+    "resolution_summary": "Added query cost limits and DataLoader batching for hot resolvers. Blocked offending client version at the gateway.",
+    "tags": [
+      "database",
+      "graphql",
+      "latency"
+    ]
+  },
+  {
+    "id": "INC-00026",
+    "created_at": "2026-02-08T04:17:31Z",
+    "environment": "qa",
+    "service": "user-auth",
+    "severity": "critical",
+    "title": "Load test accidentally run against user-auth in qa",
+    "description": "Engineering triggered a load test profile against live user-auth in qa. Synthetic traffic overwhelmed production pools and displaced real user sessions.",
+    "resolution_summary": "Stopped the test harness, restored traffic routing, and enforced environment guardrails in the load testing tool.",
+    "tags": [
+      "cache",
+      "config",
+      "incident-response",
+      "monitoring",
+      "saturation"
+    ]
+  },
+  {
+    "id": "INC-00027",
+    "created_at": "2026-01-21T20:03:38Z",
+    "environment": "stage",
+    "service": "notification-service",
+    "severity": "low",
+    "title": "Timezone handling bug in notification-service reports",
+    "description": "Daily aggregation jobs for notification-service in stage shifted boundaries after DST change. Financial reports showed duplicate and missing transactions.",
+    "resolution_summary": "Patched timezone conversion to use UTC internally and rebuilt affected report partitions.",
+    "tags": [
+      "config",
+      "cron",
+      "data-corruption",
+      "ssl"
+    ]
+  },
+  {
+    "id": "INC-00028",
+    "created_at": "2026-02-27T07:40:28Z",
+    "environment": "prod",
+    "service": "inventory-db",
+    "severity": "low",
+    "title": "Race condition caused duplicate charges in inventory-db",
+    "description": "Concurrent requests to inventory-db in prod bypassed idempotency checks under retry storms. Approximately 38 customers received duplicate charges.",
+    "resolution_summary": "Deployed distributed lock around payment intent creation and issued refunds for affected transactions.",
+    "tags": [
+      "api",
+      "database",
+      "error-rate",
+      "incident-response",
+      "timeout"
+    ]
+  },
+  {
+    "id": "INC-00029",
+    "created_at": "2026-06-04T07:20:39Z",
+    "environment": "dev",
+    "service": "checkout-frontend",
+    "severity": "critical",
+    "title": "File upload failures on checkout-frontend storage backend",
+    "description": "Multipart uploads to checkout-frontend in dev failed with 403 errors. Object storage IAM policy changes blocked the service account used by the API tier.",
+    "resolution_summary": "Restored storage permissions and added policy diff checks to infrastructure CI before apply.",
+    "tags": [
+      "auth",
+      "config",
+      "rollback",
+      "storage"
+    ]
+  },
+  {
+    "id": "INC-00030",
+    "created_at": "2026-03-07T11:48:35Z",
+    "environment": "qa",
+    "service": "order-processor",
+    "severity": "medium",
+    "title": "Email delivery backlog from order-processor",
+    "description": "Transactional emails from order-processor in qa queued for over six hours. Provider rate limits were exceeded during a marketing campaign overlap.",
+    "resolution_summary": "Throttled bulk sends, prioritized password-reset traffic, and negotiated temporary provider limit increase.",
+    "tags": [
+      "cache",
+      "latency",
+      "queue",
+      "third-party"
+    ]
+  },
+  {
+    "id": "INC-00031",
+    "created_at": "2026-05-29T17:11:34Z",
+    "environment": "stage",
+    "service": "search-indexer",
+    "severity": "low",
+    "title": "search-indexer returning 503 errors in stage",
+    "description": "Users reported widespread failures when calling search-indexer. Error rate spiked to 5% in stage. Logs show upstream connection timeouts and circuit breaker trips.",
+    "resolution_summary": "Scaled search-indexer replicas and restarted unhealthy pods. Root cause was connection pool exhaustion under peak load.",
+    "tags": [
+      "api",
+      "error-rate",
+      "queue",
+      "timeout",
+      "webhook"
+    ]
+  },
+  {
+    "id": "INC-00032",
+    "created_at": "2026-07-05T17:09:14Z",
+    "environment": "prod",
+    "service": "analytics-pipeline",
+    "severity": "high",
+    "title": "Database connection pool exhausted on analytics-pipeline",
+    "description": "Monitoring alerted on analytics-pipeline in prod: all database connections in use. Queries queued and request latency exceeded 30 seconds.",
+    "resolution_summary": "Increased pool size and terminated long-running queries. Added index on hot table to reduce lock contention.",
+    "tags": [
+      "database",
+      "latency",
+      "timeout"
+    ]
+  },
+  {
+    "id": "INC-00033",
+    "created_at": "2026-04-18T01:52:49Z",
+    "environment": "dev",
+    "service": "cdn-edge",
+    "severity": "medium",
+    "title": "Authentication failures after cdn-edge deploy",
+    "description": "Following a deployment to dev, cdn-edge began rejecting valid tokens. Login success rate dropped sharply across regions.",
+    "resolution_summary": "Rolled back the deployment and rotated signing keys. Updated config validation to catch mismatched issuer URLs.",
+    "tags": [
+      "auth",
+      "cache",
+      "config",
+      "deployment",
+      "latency"
+    ]
+  },
+  {
+    "id": "INC-00034",
+    "created_at": "2026-04-24T05:41:18Z",
+    "environment": "qa",
+    "service": "billing-service",
+    "severity": "medium",
+    "title": "Memory leak detected in billing-service (qa)",
+    "description": "Heap usage on billing-service climbed steadily over 48 hours in qa. OOM kills restarted pods every few hours.",
+    "resolution_summary": "Identified unclosed cache entries in recent release. Hotfixed memory cleanup and scheduled full redeploy.",
+    "tags": [
+      "api",
+      "deployment",
+      "graphql",
+      "memory",
+      "timeout"
+    ]
+  },
+  {
+    "id": "INC-00035",
+    "created_at": "2026-01-13T06:46:05Z",
+    "environment": "stage",
+    "service": "support-portal",
+    "severity": "medium",
+    "title": "Redis cache miss storm impacting support-portal",
+    "description": "support-portal in stage experienced a cache stampede after TTL expiry. Database load surged and p99 latency degraded.",
+    "resolution_summary": "Enabled request coalescing and staggered cache TTLs. Warmed critical keys before peak traffic.",
+    "tags": [
+      "cache",
+      "database",
+      "latency"
+    ]
+  },
+  {
+    "id": "INC-00036",
+    "created_at": "2026-02-24T23:55:43Z",
+    "environment": "prod",
+    "service": "mobile-backend",
+    "severity": "medium",
+    "title": "SSL certificate expiry on mobile-backend load balancer",
+    "description": "Clients could not reach mobile-backend in prod due to an expired TLS certificate on the load balancer.",
+    "resolution_summary": "Renewed certificate and updated auto-renewal alerts. Verified chain trust across all edge nodes.",
+    "tags": [
+      "config",
+      "networking",
+      "ssl"
+    ]
+  },
+  {
+    "id": "INC-00037",
+    "created_at": "2026-01-24T19:02:04Z",
+    "environment": "dev",
+    "service": "fraud-detection",
+    "severity": "high",
+    "title": "Message queue backlog on fraud-detection",
+    "description": "Consumer lag on fraud-detection in dev exceeded one million messages. Downstream order processing stalled.",
+    "resolution_summary": "Scaled consumer workers and replayed dead-letter queue. Fixed poison message handler that blocked partition reads.",
+    "tags": [
+      "error-rate",
+      "latency",
+      "queue"
+    ]
+  },
+  {
+    "id": "INC-00038",
+    "created_at": "2026-06-06T04:39:46Z",
+    "environment": "qa",
+    "service": "recommendation-engine",
+    "severity": "low",
+    "title": "Rate limiting misconfiguration on recommendation-engine",
+    "description": "Legitimate traffic to recommendation-engine in qa was throttled after a config change lowered rate limits too aggressively.",
+    "resolution_summary": "Restored previous rate limit thresholds and added staged rollout for gateway policy updates.",
+    "tags": [
+      "api",
+      "cache",
+      "config",
+      "rate-limit",
+      "rollback"
+    ]
+  },
+  {
+    "id": "INC-00039",
+    "created_at": "2026-04-26T06:16:13Z",
+    "environment": "stage",
+    "service": "webhook-dispatcher",
+    "severity": "high",
+    "title": "Disk space critical on webhook-dispatcher nodes",
+    "description": "Several webhook-dispatcher hosts in stage reached 98% disk usage. Log rotation failed and write operations began failing.",
+    "resolution_summary": "Expanded volumes and purged stale audit logs. Tuned log retention and added disk usage alerts.",
+    "tags": [
+      "deployment",
+      "disk",
+      "error-rate"
+    ]
+  },
+  {
+    "id": "INC-00040",
+    "created_at": "2026-06-27T21:49:57Z",
+    "environment": "prod",
+    "service": "audit-logger",
+    "severity": "medium",
+    "title": "Intermittent network partition affecting audit-logger",
+    "description": "audit-logger in prod lost connectivity to a dependency zone for 12 minutes. Retries caused retry storms across services.",
+    "resolution_summary": "Network team restored BGP routing. Added jittered backoff and bulkhead isolation between dependency calls.",
+    "tags": [
+      "api",
+      "error-rate",
+      "kubernetes",
+      "networking",
+      "timeout"
+    ]
+  },
+  {
+    "id": "INC-00041",
+    "created_at": "2026-03-27T23:26:19Z",
+    "environment": "dev",
+    "service": "image-resizer",
+    "severity": "high",
+    "title": "DNS resolution failures for image-resizer in dev",
+    "description": "Internal clients failed to resolve the image-resizer hostname in dev. Resolver timeouts caused cascading health check failures across dependent services.",
+    "resolution_summary": "Fixed stale NS records and reduced negative cache TTL. Added synthetic DNS probes to catch resolver drift early.",
+    "tags": [
+      "dns",
+      "graphql",
+      "monitoring",
+      "networking",
+      "ssl"
+    ]
+  },
+  {
+    "id": "INC-00042",
+    "created_at": "2026-04-07T04:04:40Z",
+    "environment": "qa",
+    "service": "subscription-manager",
+    "severity": "low",
+    "title": "Pod crash loop on subscription-manager after config rollout",
+    "description": "subscription-manager pods in qa entered CrashLoopBackOff after a config map update. Startup probes never passed and traffic shift stalled at 38% capacity.",
+    "resolution_summary": "Reverted config map and patched invalid environment variable references. Added schema validation to the deploy pipeline.",
+    "tags": [
+      "config",
+      "deployment",
+      "kubernetes"
+    ]
+  },
+  {
+    "id": "INC-00043",
+    "created_at": "2026-01-21T22:22:56Z",
+    "environment": "stage",
+    "service": "geo-routing-service",
+    "severity": "high",
+    "title": "Third-party API outage blocking geo-routing-service",
+    "description": "geo-routing-service in stage depends on an external vendor API that returned sustained 502 responses. Fallback logic did not activate and checkout flows failed.",
+    "resolution_summary": "Enabled degraded-mode responses and cached last-known-good data. Opened vendor ticket and documented failover runbook steps.",
+    "tags": [
+      "api",
+      "failover",
+      "third-party",
+      "timeout"
+    ]
+  },
+  {
+    "id": "INC-00044",
+    "created_at": "2026-02-21T06:17:14Z",
+    "environment": "prod",
+    "service": "document-parser",
+    "severity": "high",
+    "title": "Suspected data corruption in document-parser records",
+    "description": "Support escalations reported inconsistent account states served by document-parser in prod. Audit sampling found mismatched version fields on 42% of recent writes.",
+    "resolution_summary": "Paused write path, restored from point-in-time backup, and replayed events through a repaired serializer.",
+    "tags": [
+      "data-corruption",
+      "database",
+      "rollback"
+    ]
+  },
+  {
+    "id": "INC-00045",
+    "created_at": "2026-01-20T22:22:17Z",
+    "environment": "dev",
+    "service": "metrics-collector",
+    "severity": "critical",
+    "title": "DDoS traffic spike targeting metrics-collector",
+    "description": "Edge metrics showed a 45\u00d7 increase in anonymous requests against metrics-collector in dev. Origin CPU saturated and legitimate users saw elevated error rates.",
+    "resolution_summary": "Activated WAF rules and geo-fenced suspicious ASNs. Scaled edge capacity and enabled challenge mode for abusive IPs.",
+    "tags": [
+      "ddos",
+      "networking",
+      "saturation"
+    ]
+  },
+  {
+    "id": "INC-00046",
+    "created_at": "2026-06-25T10:11:28Z",
+    "environment": "qa",
+    "service": "feature-flags-service",
+    "severity": "critical",
+    "title": "Feature flag misconfiguration in feature-flags-service",
+    "description": "A flag rollout enabled experimental code for all tenants on feature-flags-service in qa. Error dashboards spiked within minutes of the change.",
+    "resolution_summary": "Disabled the flag globally and restricted future rollouts to canary cohorts with automatic rollback thresholds.",
+    "tags": [
+      "api",
+      "config",
+      "deployment",
+      "error-rate"
+    ]
+  },
+  {
+    "id": "INC-00047",
+    "created_at": "2026-05-19T09:39:44Z",
+    "environment": "stage",
+    "service": "session-store",
+    "severity": "high",
+    "title": "Schema migration timeout on session-store database",
+    "description": "An online migration against session-store in stage held table locks for over 20 minutes. Write traffic blocked and support tickets increased sharply.",
+    "resolution_summary": "Cancelled migration, applied changes in smaller batches, and scheduled remaining steps during a maintenance window.",
+    "tags": [
+      "auth",
+      "database",
+      "latency",
+      "migration"
+    ]
+  },
+  {
+    "id": "INC-00048",
+    "created_at": "2026-05-01T09:20:27Z",
+    "environment": "prod",
+    "service": "email-gateway",
+    "severity": "high",
+    "title": "Log pipeline drop causing blind spots for email-gateway",
+    "description": "Log shipping from email-gateway in prod fell to near zero. On-call engineers lost visibility while customer-impacting errors continued.",
+    "resolution_summary": "Restarted log agents and increased buffer limits. Added alerts on ingest rate anomalies per service.",
+    "tags": [
+      "auth",
+      "disk",
+      "monitoring",
+      "queue"
+    ]
+  },
+  {
+    "id": "INC-00049",
+    "created_at": "2026-02-15T11:22:28Z",
+    "environment": "dev",
+    "service": "payment-api",
+    "severity": "low",
+    "title": "Cold start latency regression on payment-api",
+    "description": "Serverless instances of payment-api in dev took up to 12 seconds to become ready. Autoscaling added capacity too slowly during a traffic burst.",
+    "resolution_summary": "Pre-warmed minimum instances and trimmed startup dependencies. Tuned autoscaling signals to react on queue depth.",
+    "tags": [
+      "deployment",
+      "latency",
+      "saturation"
+    ]
+  },
+  {
+    "id": "INC-00050",
+    "created_at": "2026-03-19T07:08:46Z",
+    "environment": "qa",
+    "service": "user-auth",
+    "severity": "critical",
+    "title": "Webhook delivery failures from user-auth",
+    "description": "user-auth in qa failed to deliver outbound webhooks after TLS cipher policy tightened. Partner integrations missed 32% of expected callbacks.",
+    "resolution_summary": "Restored compatible cipher suites and retried failed deliveries from the dead-letter store with idempotency keys.",
+    "tags": [
+      "rate-limit",
+      "ssl",
+      "third-party",
+      "webhook"
+    ]
+  },
+  {
+    "id": "INC-00051",
+    "created_at": "2026-05-20T06:06:22Z",
+    "environment": "stage",
+    "service": "notification-service",
+    "severity": "low",
+    "title": "Session store unavailable for notification-service",
+    "description": "Users were logged out repeatedly from notification-service in stage. Session cluster nodes reported split-brain and rejected writes.",
+    "resolution_summary": "Forced quorum recovery, rebuilt replica set, and extended session TTL temporarily while caches repopulated.",
+    "tags": [
+      "auth",
+      "cache",
+      "failover",
+      "graphql",
+      "memory"
+    ]
+  },
+  {
+    "id": "INC-00052",
+    "created_at": "2026-05-30T21:43:16Z",
+    "environment": "prod",
+    "service": "inventory-db",
+    "severity": "critical",
+    "title": "CDN cache serving stale assets for inventory-db",
+    "description": "Customers saw outdated UI assets from inventory-db in prod. CDN purge jobs failed silently and edge nodes kept old bundles.",
+    "resolution_summary": "Issued manual global purge and fixed purge API credentials. Added post-deploy verification of asset hashes.",
+    "tags": [
+      "cache",
+      "config",
+      "deployment",
+      "saturation"
+    ]
+  },
+  {
+    "id": "INC-00053",
+    "created_at": "2026-02-15T16:52:28Z",
+    "environment": "dev",
+    "service": "checkout-frontend",
+    "severity": "critical",
+    "title": "Scheduled cron job failed on checkout-frontend",
+    "description": "A nightly reconciliation job for checkout-frontend in dev did not run for three days. Billing adjustments backlog grew to 20 thousand records.",
+    "resolution_summary": "Re-enabled cron scheduler after token expiry fix and backfilled missed runs with throttled batch workers.",
+    "tags": [
+      "cron",
+      "error-rate",
+      "queue"
+    ]
+  },
+  {
+    "id": "INC-00054",
+    "created_at": "2026-04-01T10:06:39Z",
+    "environment": "qa",
+    "service": "order-processor",
+    "severity": "low",
+    "title": "Secrets rotation broke order-processor credentials",
+    "description": "Automated secret rotation updated database credentials for order-processor in qa but running pods kept stale values. Connection errors spiked across all zones.",
+    "resolution_summary": "Triggered rolling restart after rotation and wired secret reload hooks into the deployment controller.",
+    "tags": [
+      "database",
+      "deployment",
+      "secrets"
+    ]
+  },
+  {
+    "id": "INC-00055",
+    "created_at": "2026-02-27T00:10:56Z",
+    "environment": "stage",
+    "service": "search-indexer",
+    "severity": "medium",
+    "title": "GraphQL N+1 query storm on search-indexer",
+    "description": "A new client release issued deeply nested GraphQL queries against search-indexer in stage. Database CPU hit 34% and API latency exceeded SLOs.",
+    "resolution_summary": "Added query cost limits and DataLoader batching for hot resolvers. Blocked offending client version at the gateway.",
+    "tags": [
+      "database",
+      "graphql",
+      "latency"
+    ]
+  },
+  {
+    "id": "INC-00056",
+    "created_at": "2026-01-28T12:17:15Z",
+    "environment": "prod",
+    "service": "analytics-pipeline",
+    "severity": "low",
+    "title": "Load test accidentally run against analytics-pipeline in prod",
+    "description": "Engineering triggered a load test profile against live analytics-pipeline in prod. Synthetic traffic overwhelmed production pools and displaced real user sessions.",
+    "resolution_summary": "Stopped the test harness, restored traffic routing, and enforced environment guardrails in the load testing tool.",
+    "tags": [
+      "config",
+      "incident-response",
+      "saturation"
+    ]
+  },
+  {
+    "id": "INC-00057",
+    "created_at": "2026-07-08T09:10:58Z",
+    "environment": "dev",
+    "service": "cdn-edge",
+    "severity": "critical",
+    "title": "Timezone handling bug in cdn-edge reports",
+    "description": "Daily aggregation jobs for cdn-edge in dev shifted boundaries after DST change. Financial reports showed duplicate and missing transactions.",
+    "resolution_summary": "Patched timezone conversion to use UTC internally and rebuilt affected report partitions.",
+    "tags": [
+      "config",
+      "cron",
+      "data-corruption"
+    ]
+  },
+  {
+    "id": "INC-00058",
+    "created_at": "2026-04-13T19:15:06Z",
+    "environment": "qa",
+    "service": "billing-service",
+    "severity": "high",
+    "title": "Race condition caused duplicate charges in billing-service",
+    "description": "Concurrent requests to billing-service in qa bypassed idempotency checks under retry storms. Approximately 31 customers received duplicate charges.",
+    "resolution_summary": "Deployed distributed lock around payment intent creation and issued refunds for affected transactions.",
+    "tags": [
+      "api",
+      "database",
+      "error-rate",
+      "latency"
+    ]
+  },
+  {
+    "id": "INC-00059",
+    "created_at": "2026-02-10T11:15:52Z",
+    "environment": "stage",
+    "service": "support-portal",
+    "severity": "low",
+    "title": "File upload failures on support-portal storage backend",
+    "description": "Multipart uploads to support-portal in stage failed with 403 errors. Object storage IAM policy changes blocked the service account used by the API tier.",
+    "resolution_summary": "Restored storage permissions and added policy diff checks to infrastructure CI before apply.",
+    "tags": [
+      "auth",
+      "config",
+      "storage",
+      "timeout"
+    ]
+  },
+  {
+    "id": "INC-00060",
+    "created_at": "2026-07-08T09:53:13Z",
+    "environment": "prod",
+    "service": "mobile-backend",
+    "severity": "low",
+    "title": "Email delivery backlog from mobile-backend",
+    "description": "Transactional emails from mobile-backend in prod queued for over six hours. Provider rate limits were exceeded during a marketing campaign overlap.",
+    "resolution_summary": "Throttled bulk sends, prioritized password-reset traffic, and negotiated temporary provider limit increase.",
+    "tags": [
+      "disk",
+      "latency",
+      "queue",
+      "third-party"
+    ]
+  },
+  {
+    "id": "INC-00061",
+    "created_at": "2026-05-18T00:32:37Z",
+    "environment": "dev",
+    "service": "fraud-detection",
+    "severity": "low",
+    "title": "fraud-detection returning 503 errors in dev",
+    "description": "Users reported widespread failures when calling fraud-detection. Error rate spiked to 40% in dev. Logs show upstream connection timeouts and circuit breaker trips.",
+    "resolution_summary": "Scaled fraud-detection replicas and restarted unhealthy pods. Root cause was connection pool exhaustion under peak load.",
+    "tags": [
+      "api",
+      "error-rate",
+      "migration",
+      "networking",
+      "timeout"
+    ]
+  },
+  {
+    "id": "INC-00062",
+    "created_at": "2026-02-20T18:33:34Z",
+    "environment": "qa",
+    "service": "recommendation-engine",
+    "severity": "high",
+    "title": "Database connection pool exhausted on recommendation-engine",
+    "description": "Monitoring alerted on recommendation-engine in qa: all database connections in use. Queries queued and request latency exceeded 30 seconds.",
+    "resolution_summary": "Increased pool size and terminated long-running queries. Added index on hot table to reduce lock contention.",
+    "tags": [
+      "database",
+      "latency",
+      "timeout"
+    ]
+  },
+  {
+    "id": "INC-00063",
+    "created_at": "2026-01-20T14:24:34Z",
+    "environment": "stage",
+    "service": "webhook-dispatcher",
+    "severity": "critical",
+    "title": "Authentication failures after webhook-dispatcher deploy",
+    "description": "Following a deployment to stage, webhook-dispatcher began rejecting valid tokens. Login success rate dropped sharply across regions.",
+    "resolution_summary": "Rolled back the deployment and rotated signing keys. Updated config validation to catch mismatched issuer URLs.",
+    "tags": [
+      "auth",
+      "config",
+      "deployment"
+    ]
+  },
+  {
+    "id": "INC-00064",
+    "created_at": "2026-07-07T00:39:16Z",
+    "environment": "prod",
+    "service": "audit-logger",
+    "severity": "low",
+    "title": "Memory leak detected in audit-logger (prod)",
+    "description": "Heap usage on audit-logger climbed steadily over 48 hours in prod. OOM kills restarted pods every few hours.",
+    "resolution_summary": "Identified unclosed cache entries in recent release. Hotfixed memory cleanup and scheduled full redeploy.",
+    "tags": [
+      "api",
+      "database",
+      "deployment",
+      "latency",
+      "memory"
+    ]
+  },
+  {
+    "id": "INC-00065",
+    "created_at": "2026-01-22T19:19:57Z",
+    "environment": "dev",
+    "service": "image-resizer",
+    "severity": "critical",
+    "title": "Redis cache miss storm impacting image-resizer",
+    "description": "image-resizer in dev experienced a cache stampede after TTL expiry. Database load surged and p99 latency degraded.",
+    "resolution_summary": "Enabled request coalescing and staggered cache TTLs. Warmed critical keys before peak traffic.",
+    "tags": [
+      "cache",
+      "database",
+      "latency",
+      "memory",
+      "third-party"
+    ]
+  },
+  {
+    "id": "INC-00066",
+    "created_at": "2026-02-01T18:42:43Z",
+    "environment": "qa",
+    "service": "subscription-manager",
+    "severity": "high",
+    "title": "SSL certificate expiry on subscription-manager load balancer",
+    "description": "Clients could not reach subscription-manager in qa due to an expired TLS certificate on the load balancer.",
+    "resolution_summary": "Renewed certificate and updated auto-renewal alerts. Verified chain trust across all edge nodes.",
+    "tags": [
+      "config",
+      "latency",
+      "networking",
+      "secrets",
+      "ssl"
+    ]
+  },
+  {
+    "id": "INC-00067",
+    "created_at": "2026-01-25T10:04:13Z",
+    "environment": "stage",
+    "service": "geo-routing-service",
+    "severity": "critical",
+    "title": "Message queue backlog on geo-routing-service",
+    "description": "Consumer lag on geo-routing-service in stage exceeded one million messages. Downstream order processing stalled.",
+    "resolution_summary": "Scaled consumer workers and replayed dead-letter queue. Fixed poison message handler that blocked partition reads.",
+    "tags": [
+      "error-rate",
+      "latency",
+      "queue",
+      "third-party"
+    ]
+  },
+  {
+    "id": "INC-00068",
+    "created_at": "2026-02-18T03:55:00Z",
+    "environment": "prod",
+    "service": "document-parser",
+    "severity": "medium",
+    "title": "Rate limiting misconfiguration on document-parser",
+    "description": "Legitimate traffic to document-parser in prod was throttled after a config change lowered rate limits too aggressively.",
+    "resolution_summary": "Restored previous rate limit thresholds and added staged rollout for gateway policy updates.",
+    "tags": [
+      "api",
+      "config",
+      "failover",
+      "queue",
+      "rate-limit"
+    ]
+  },
+  {
+    "id": "INC-00069",
+    "created_at": "2026-03-27T08:29:44Z",
+    "environment": "dev",
+    "service": "metrics-collector",
+    "severity": "high",
+    "title": "Disk space critical on metrics-collector nodes",
+    "description": "Several metrics-collector hosts in dev reached 98% disk usage. Log rotation failed and write operations began failing.",
+    "resolution_summary": "Expanded volumes and purged stale audit logs. Tuned log retention and added disk usage alerts.",
+    "tags": [
+      "deployment",
+      "disk",
+      "error-rate"
+    ]
+  },
+  {
+    "id": "INC-00070",
+    "created_at": "2026-03-11T21:29:33Z",
+    "environment": "qa",
+    "service": "feature-flags-service",
+    "severity": "medium",
+    "title": "Intermittent network partition affecting feature-flags-service",
+    "description": "feature-flags-service in qa lost connectivity to a dependency zone for 12 minutes. Retries caused retry storms across services.",
+    "resolution_summary": "Network team restored BGP routing. Added jittered backoff and bulkhead isolation between dependency calls.",
+    "tags": [
+      "api",
+      "networking",
+      "timeout"
+    ]
+  },
+  {
+    "id": "INC-00071",
+    "created_at": "2026-05-10T02:48:42Z",
+    "environment": "stage",
+    "service": "session-store",
+    "severity": "critical",
+    "title": "DNS resolution failures for session-store in stage",
+    "description": "Internal clients failed to resolve the session-store hostname in stage. Resolver timeouts caused cascading health check failures across dependent services.",
+    "resolution_summary": "Fixed stale NS records and reduced negative cache TTL. Added synthetic DNS probes to catch resolver drift early.",
+    "tags": [
+      "api",
+      "dns",
+      "memory",
+      "monitoring",
+      "networking"
+    ]
+  },
+  {
+    "id": "INC-00072",
+    "created_at": "2026-03-01T23:55:24Z",
+    "environment": "prod",
+    "service": "email-gateway",
+    "severity": "high",
+    "title": "Pod crash loop on email-gateway after config rollout",
+    "description": "email-gateway pods in prod entered CrashLoopBackOff after a config map update. Startup probes never passed and traffic shift stalled at 37% capacity.",
+    "resolution_summary": "Reverted config map and patched invalid environment variable references. Added schema validation to the deploy pipeline.",
+    "tags": [
+      "config",
+      "deployment",
+      "kubernetes"
+    ]
+  },
+  {
+    "id": "INC-00073",
+    "created_at": "2026-06-29T05:41:46Z",
+    "environment": "dev",
+    "service": "payment-api",
+    "severity": "medium",
+    "title": "Third-party API outage blocking payment-api",
+    "description": "payment-api in dev depends on an external vendor API that returned sustained 502 responses. Fallback logic did not activate and checkout flows failed.",
+    "resolution_summary": "Enabled degraded-mode responses and cached last-known-good data. Opened vendor ticket and documented failover runbook steps.",
+    "tags": [
+      "api",
+      "failover",
+      "third-party"
+    ]
+  },
+  {
+    "id": "INC-00074",
+    "created_at": "2026-02-09T03:09:12Z",
+    "environment": "qa",
+    "service": "user-auth",
+    "severity": "medium",
+    "title": "Suspected data corruption in user-auth records",
+    "description": "Support escalations reported inconsistent account states served by user-auth in qa. Audit sampling found mismatched version fields on 23% of recent writes.",
+    "resolution_summary": "Paused write path, restored from point-in-time backup, and replayed events through a repaired serializer.",
+    "tags": [
+      "data-corruption",
+      "database",
+      "rollback",
+      "saturation"
+    ]
+  },
+  {
+    "id": "INC-00075",
+    "created_at": "2026-06-15T05:21:30Z",
+    "environment": "stage",
+    "service": "notification-service",
+    "severity": "medium",
+    "title": "DDoS traffic spike targeting notification-service",
+    "description": "Edge metrics showed a 44\u00d7 increase in anonymous requests against notification-service in stage. Origin CPU saturated and legitimate users saw elevated error rates.",
+    "resolution_summary": "Activated WAF rules and geo-fenced suspicious ASNs. Scaled edge capacity and enabled challenge mode for abusive IPs.",
+    "tags": [
+      "ddos",
+      "migration",
+      "networking",
+      "saturation",
+      "timeout"
+    ]
+  },
+  {
+    "id": "INC-00076",
+    "created_at": "2026-07-10T19:43:51Z",
+    "environment": "prod",
+    "service": "inventory-db",
+    "severity": "medium",
+    "title": "Feature flag misconfiguration in inventory-db",
+    "description": "A flag rollout enabled experimental code for all tenants on inventory-db in prod. Error dashboards spiked within minutes of the change.",
+    "resolution_summary": "Disabled the flag globally and restricted future rollouts to canary cohorts with automatic rollback thresholds.",
+    "tags": [
+      "config",
+      "deployment",
+      "error-rate"
+    ]
+  },
+  {
+    "id": "INC-00077",
+    "created_at": "2026-07-01T06:21:42Z",
+    "environment": "dev",
+    "service": "checkout-frontend",
+    "severity": "medium",
+    "title": "Schema migration timeout on checkout-frontend database",
+    "description": "An online migration against checkout-frontend in dev held table locks for over 20 minutes. Write traffic blocked and support tickets increased sharply.",
+    "resolution_summary": "Cancelled migration, applied changes in smaller batches, and scheduled remaining steps during a maintenance window.",
+    "tags": [
+      "database",
+      "latency",
+      "migration"
+    ]
+  },
+  {
+    "id": "INC-00078",
+    "created_at": "2026-03-05T05:04:45Z",
+    "environment": "qa",
+    "service": "order-processor",
+    "severity": "high",
+    "title": "Log pipeline drop causing blind spots for order-processor",
+    "description": "Log shipping from order-processor in qa fell to near zero. On-call engineers lost visibility while customer-impacting errors continued.",
+    "resolution_summary": "Restarted log agents and increased buffer limits. Added alerts on ingest rate anomalies per service.",
+    "tags": [
+      "disk",
+      "monitoring",
+      "networking",
+      "queue",
+      "third-party"
+    ]
+  },
+  {
+    "id": "INC-00079",
+    "created_at": "2026-05-22T23:58:07Z",
+    "environment": "stage",
+    "service": "search-indexer",
+    "severity": "medium",
+    "title": "Cold start latency regression on search-indexer",
+    "description": "Serverless instances of search-indexer in stage took up to 12 seconds to become ready. Autoscaling added capacity too slowly during a traffic burst.",
+    "resolution_summary": "Pre-warmed minimum instances and trimmed startup dependencies. Tuned autoscaling signals to react on queue depth.",
+    "tags": [
+      "deployment",
+      "disk",
+      "incident-response",
+      "latency",
+      "saturation"
+    ]
+  },
+  {
+    "id": "INC-00080",
+    "created_at": "2026-07-04T07:10:25Z",
+    "environment": "prod",
+    "service": "analytics-pipeline",
+    "severity": "low",
+    "title": "Webhook delivery failures from analytics-pipeline",
+    "description": "analytics-pipeline in prod failed to deliver outbound webhooks after TLS cipher policy tightened. Partner integrations missed 21% of expected callbacks.",
+    "resolution_summary": "Restored compatible cipher suites and retried failed deliveries from the dead-letter store with idempotency keys.",
+    "tags": [
+      "ssl",
+      "third-party",
+      "webhook"
+    ]
+  },
+  {
+    "id": "INC-00081",
+    "created_at": "2026-04-01T18:00:22Z",
+    "environment": "dev",
+    "service": "cdn-edge",
+    "severity": "critical",
+    "title": "Session store unavailable for cdn-edge",
+    "description": "Users were logged out repeatedly from cdn-edge in dev. Session cluster nodes reported split-brain and rejected writes.",
+    "resolution_summary": "Forced quorum recovery, rebuilt replica set, and extended session TTL temporarily while caches repopulated.",
+    "tags": [
+      "auth",
+      "cache",
+      "database",
+      "failover"
+    ]
+  },
+  {
+    "id": "INC-00082",
+    "created_at": "2026-06-08T05:40:33Z",
+    "environment": "qa",
+    "service": "billing-service",
+    "severity": "critical",
+    "title": "CDN cache serving stale assets for billing-service",
+    "description": "Customers saw outdated UI assets from billing-service in qa. CDN purge jobs failed silently and edge nodes kept old bundles.",
+    "resolution_summary": "Issued manual global purge and fixed purge API credentials. Added post-deploy verification of asset hashes.",
+    "tags": [
+      "cache",
+      "config",
+      "deployment"
+    ]
+  },
+  {
+    "id": "INC-00083",
+    "created_at": "2026-06-02T10:23:11Z",
+    "environment": "stage",
+    "service": "support-portal",
+    "severity": "medium",
+    "title": "Scheduled cron job failed on support-portal",
+    "description": "A nightly reconciliation job for support-portal in stage did not run for three days. Billing adjustments backlog grew to 15 thousand records.",
+    "resolution_summary": "Re-enabled cron scheduler after token expiry fix and backfilled missed runs with throttled batch workers.",
+    "tags": [
+      "cron",
+      "error-rate",
+      "queue",
+      "webhook"
+    ]
+  },
+  {
+    "id": "INC-00084",
+    "created_at": "2026-01-11T09:03:50Z",
+    "environment": "prod",
+    "service": "mobile-backend",
+    "severity": "low",
+    "title": "Secrets rotation broke mobile-backend credentials",
+    "description": "Automated secret rotation updated database credentials for mobile-backend in prod but running pods kept stale values. Connection errors spiked across all zones.",
+    "resolution_summary": "Triggered rolling restart after rotation and wired secret reload hooks into the deployment controller.",
+    "tags": [
+      "database",
+      "deployment",
+      "secrets"
+    ]
+  },
+  {
+    "id": "INC-00085",
+    "created_at": "2026-04-25T10:38:06Z",
+    "environment": "dev",
+    "service": "fraud-detection",
+    "severity": "critical",
+    "title": "GraphQL N+1 query storm on fraud-detection",
+    "description": "A new client release issued deeply nested GraphQL queries against fraud-detection in dev. Database CPU hit 14% and API latency exceeded SLOs.",
+    "resolution_summary": "Added query cost limits and DataLoader batching for hot resolvers. Blocked offending client version at the gateway.",
+    "tags": [
+      "database",
+      "graphql",
+      "latency"
+    ]
+  },
+  {
+    "id": "INC-00086",
+    "created_at": "2026-04-26T18:57:12Z",
+    "environment": "qa",
+    "service": "recommendation-engine",
+    "severity": "medium",
+    "title": "Load test accidentally run against recommendation-engine in qa",
+    "description": "Engineering triggered a load test profile against live recommendation-engine in qa. Synthetic traffic overwhelmed production pools and displaced real user sessions.",
+    "resolution_summary": "Stopped the test harness, restored traffic routing, and enforced environment guardrails in the load testing tool.",
+    "tags": [
+      "config",
+      "incident-response",
+      "saturation"
+    ]
+  },
+  {
+    "id": "INC-00087",
+    "created_at": "2026-01-17T14:56:11Z",
+    "environment": "stage",
+    "service": "webhook-dispatcher",
+    "severity": "low",
+    "title": "Timezone handling bug in webhook-dispatcher reports",
+    "description": "Daily aggregation jobs for webhook-dispatcher in stage shifted boundaries after DST change. Financial reports showed duplicate and missing transactions.",
+    "resolution_summary": "Patched timezone conversion to use UTC internally and rebuilt affected report partitions.",
+    "tags": [
+      "config",
+      "cron",
+      "data-corruption",
+      "queue"
+    ]
+  },
+  {
+    "id": "INC-00088",
+    "created_at": "2026-02-19T07:01:39Z",
+    "environment": "prod",
+    "service": "audit-logger",
+    "severity": "critical",
+    "title": "Race condition caused duplicate charges in audit-logger",
+    "description": "Concurrent requests to audit-logger in prod bypassed idempotency checks under retry storms. Approximately 27 customers received duplicate charges.",
+    "resolution_summary": "Deployed distributed lock around payment intent creation and issued refunds for affected transactions.",
+    "tags": [
+      "api",
+      "database",
+      "disk",
+      "error-rate",
+      "third-party"
+    ]
+  },
+  {
+    "id": "INC-00089",
+    "created_at": "2026-06-09T23:36:18Z",
+    "environment": "dev",
+    "service": "image-resizer",
+    "severity": "critical",
+    "title": "File upload failures on image-resizer storage backend",
+    "description": "Multipart uploads to image-resizer in dev failed with 403 errors. Object storage IAM policy changes blocked the service account used by the API tier.",
+    "resolution_summary": "Restored storage permissions and added policy diff checks to infrastructure CI before apply.",
+    "tags": [
+      "auth",
+      "config",
+      "dns",
+      "incident-response",
+      "storage"
+    ]
+  },
+  {
+    "id": "INC-00090",
+    "created_at": "2026-06-26T09:21:16Z",
+    "environment": "qa",
+    "service": "subscription-manager",
+    "severity": "high",
+    "title": "Email delivery backlog from subscription-manager",
+    "description": "Transactional emails from subscription-manager in qa queued for over six hours. Provider rate limits were exceeded during a marketing campaign overlap.",
+    "resolution_summary": "Throttled bulk sends, prioritized password-reset traffic, and negotiated temporary provider limit increase.",
+    "tags": [
+      "latency",
+      "queue",
+      "third-party"
+    ]
+  },
+  {
+    "id": "INC-00091",
+    "created_at": "2026-01-14T07:30:46Z",
+    "environment": "stage",
+    "service": "geo-routing-service",
+    "severity": "high",
+    "title": "geo-routing-service returning 503 errors in stage",
+    "description": "Users reported widespread failures when calling geo-routing-service. Error rate spiked to 31% in stage. Logs show upstream connection timeouts and circuit breaker trips.",
+    "resolution_summary": "Scaled geo-routing-service replicas and restarted unhealthy pods. Root cause was connection pool exhaustion under peak load.",
+    "tags": [
+      "api",
+      "error-rate",
+      "timeout"
+    ]
+  },
+  {
+    "id": "INC-00092",
+    "created_at": "2026-06-14T06:41:12Z",
+    "environment": "prod",
+    "service": "document-parser",
+    "severity": "medium",
+    "title": "Database connection pool exhausted on document-parser",
+    "description": "Monitoring alerted on document-parser in prod: all database connections in use. Queries queued and request latency exceeded 30 seconds.",
+    "resolution_summary": "Increased pool size and terminated long-running queries. Added index on hot table to reduce lock contention.",
+    "tags": [
+      "database",
+      "incident-response",
+      "latency",
+      "monitoring",
+      "timeout"
+    ]
+  },
+  {
+    "id": "INC-00093",
+    "created_at": "2026-02-09T09:54:56Z",
+    "environment": "dev",
+    "service": "metrics-collector",
+    "severity": "high",
+    "title": "Authentication failures after metrics-collector deploy",
+    "description": "Following a deployment to dev, metrics-collector began rejecting valid tokens. Login success rate dropped sharply across regions.",
+    "resolution_summary": "Rolled back the deployment and rotated signing keys. Updated config validation to catch mismatched issuer URLs.",
+    "tags": [
+      "auth",
+      "config",
+      "deployment",
+      "dns",
+      "memory"
+    ]
+  },
+  {
+    "id": "INC-00094",
+    "created_at": "2026-02-21T16:36:58Z",
+    "environment": "qa",
+    "service": "feature-flags-service",
+    "severity": "critical",
+    "title": "Memory leak detected in feature-flags-service (qa)",
+    "description": "Heap usage on feature-flags-service climbed steadily over 48 hours in qa. OOM kills restarted pods every few hours.",
+    "resolution_summary": "Identified unclosed cache entries in recent release. Hotfixed memory cleanup and scheduled full redeploy.",
+    "tags": [
+      "api",
+      "deployment",
+      "memory"
+    ]
+  },
+  {
+    "id": "INC-00095",
+    "created_at": "2026-03-09T18:17:33Z",
+    "environment": "stage",
+    "service": "session-store",
+    "severity": "low",
+    "title": "Redis cache miss storm impacting session-store",
+    "description": "session-store in stage experienced a cache stampede after TTL expiry. Database load surged and p99 latency degraded.",
+    "resolution_summary": "Enabled request coalescing and staggered cache TTLs. Warmed critical keys before peak traffic.",
+    "tags": [
+      "cache",
+      "database",
+      "latency"
+    ]
+  },
+  {
+    "id": "INC-00096",
+    "created_at": "2026-05-17T15:58:39Z",
+    "environment": "prod",
+    "service": "email-gateway",
+    "severity": "high",
+    "title": "SSL certificate expiry on email-gateway load balancer",
+    "description": "Clients could not reach email-gateway in prod due to an expired TLS certificate on the load balancer.",
+    "resolution_summary": "Renewed certificate and updated auto-renewal alerts. Verified chain trust across all edge nodes.",
+    "tags": [
+      "config",
+      "networking",
+      "ssl"
+    ]
+  },
+  {
+    "id": "INC-00097",
+    "created_at": "2026-03-04T14:23:03Z",
+    "environment": "dev",
+    "service": "payment-api",
+    "severity": "low",
+    "title": "Message queue backlog on payment-api",
+    "description": "Consumer lag on payment-api in dev exceeded one million messages. Downstream order processing stalled.",
+    "resolution_summary": "Scaled consumer workers and replayed dead-letter queue. Fixed poison message handler that blocked partition reads.",
+    "tags": [
+      "error-rate",
+      "latency",
+      "queue"
+    ]
+  },
+  {
+    "id": "INC-00098",
+    "created_at": "2026-05-14T01:31:17Z",
+    "environment": "qa",
+    "service": "user-auth",
+    "severity": "medium",
+    "title": "Rate limiting misconfiguration on user-auth",
+    "description": "Legitimate traffic to user-auth in qa was throttled after a config change lowered rate limits too aggressively.",
+    "resolution_summary": "Restored previous rate limit thresholds and added staged rollout for gateway policy updates.",
+    "tags": [
+      "api",
+      "config",
+      "dns",
+      "rate-limit",
+      "third-party"
+    ]
+  },
+  {
+    "id": "INC-00099",
+    "created_at": "2026-01-31T21:31:53Z",
+    "environment": "stage",
+    "service": "notification-service",
+    "severity": "medium",
+    "title": "Disk space critical on notification-service nodes",
+    "description": "Several notification-service hosts in stage reached 98% disk usage. Log rotation failed and write operations began failing.",
+    "resolution_summary": "Expanded volumes and purged stale audit logs. Tuned log retention and added disk usage alerts.",
+    "tags": [
+      "deployment",
+      "disk",
+      "error-rate",
+      "networking"
+    ]
+  },
+  {
+    "id": "INC-00100",
+    "created_at": "2026-01-30T13:11:32Z",
+    "environment": "prod",
+    "service": "inventory-db",
+    "severity": "medium",
+    "title": "Intermittent network partition affecting inventory-db",
+    "description": "inventory-db in prod lost connectivity to a dependency zone for 12 minutes. Retries caused retry storms across services.",
+    "resolution_summary": "Network team restored BGP routing. Added jittered backoff and bulkhead isolation between dependency calls.",
+    "tags": [
+      "api",
+      "kubernetes",
+      "networking",
+      "rate-limit",
+      "timeout"
+    ]
+  },
+  {
+    "id": "INC-00101",
+    "created_at": "2026-05-07T05:08:16Z",
+    "environment": "dev",
+    "service": "checkout-frontend",
+    "severity": "medium",
+    "title": "DNS resolution failures for checkout-frontend in dev",
+    "description": "Internal clients failed to resolve the checkout-frontend hostname in dev. Resolver timeouts caused cascading health check failures across dependent services.",
+    "resolution_summary": "Fixed stale NS records and reduced negative cache TTL. Added synthetic DNS probes to catch resolver drift early.",
+    "tags": [
+      "config",
+      "dns",
+      "memory",
+      "monitoring",
+      "networking"
+    ]
+  },
+  {
+    "id": "INC-00102",
+    "created_at": "2026-01-18T02:51:22Z",
+    "environment": "qa",
+    "service": "order-processor",
+    "severity": "high",
+    "title": "Pod crash loop on order-processor after config rollout",
+    "description": "order-processor pods in qa entered CrashLoopBackOff after a config map update. Startup probes never passed and traffic shift stalled at 21% capacity.",
+    "resolution_summary": "Reverted config map and patched invalid environment variable references. Added schema validation to the deploy pipeline.",
+    "tags": [
+      "config",
+      "deployment",
+      "dns",
+      "kubernetes",
+      "timeout"
+    ]
+  },
+  {
+    "id": "INC-00103",
+    "created_at": "2026-04-03T05:59:29Z",
+    "environment": "stage",
+    "service": "search-indexer",
+    "severity": "high",
+    "title": "Third-party API outage blocking search-indexer",
+    "description": "search-indexer in stage depends on an external vendor API that returned sustained 502 responses. Fallback logic did not activate and checkout flows failed.",
+    "resolution_summary": "Enabled degraded-mode responses and cached last-known-good data. Opened vendor ticket and documented failover runbook steps.",
+    "tags": [
+      "api",
+      "failover",
+      "third-party"
+    ]
+  },
+  {
+    "id": "INC-00104",
+    "created_at": "2026-03-11T10:57:10Z",
+    "environment": "prod",
+    "service": "analytics-pipeline",
+    "severity": "medium",
+    "title": "Suspected data corruption in analytics-pipeline records",
+    "description": "Support escalations reported inconsistent account states served by analytics-pipeline in prod. Audit sampling found mismatched version fields on 44% of recent writes.",
+    "resolution_summary": "Paused write path, restored from point-in-time backup, and replayed events through a repaired serializer.",
+    "tags": [
+      "data-corruption",
+      "database",
+      "deployment",
+      "incident-response",
+      "rollback"
+    ]
+  },
+  {
+    "id": "INC-00105",
+    "created_at": "2026-03-10T13:22:15Z",
+    "environment": "dev",
+    "service": "cdn-edge",
+    "severity": "medium",
+    "title": "DDoS traffic spike targeting cdn-edge",
+    "description": "Edge metrics showed a 37\u00d7 increase in anonymous requests against cdn-edge in dev. Origin CPU saturated and legitimate users saw elevated error rates.",
+    "resolution_summary": "Activated WAF rules and geo-fenced suspicious ASNs. Scaled edge capacity and enabled challenge mode for abusive IPs.",
+    "tags": [
+      "ddos",
+      "networking",
+      "queue",
+      "rate-limit",
+      "saturation"
+    ]
+  },
+  {
+    "id": "INC-00106",
+    "created_at": "2026-04-27T03:44:57Z",
+    "environment": "qa",
+    "service": "billing-service",
+    "severity": "low",
+    "title": "Feature flag misconfiguration in billing-service",
+    "description": "A flag rollout enabled experimental code for all tenants on billing-service in qa. Error dashboards spiked within minutes of the change.",
+    "resolution_summary": "Disabled the flag globally and restricted future rollouts to canary cohorts with automatic rollback thresholds.",
+    "tags": [
+      "config",
+      "deployment",
+      "error-rate"
+    ]
+  },
+  {
+    "id": "INC-00107",
+    "created_at": "2026-05-18T14:47:44Z",
+    "environment": "stage",
+    "service": "support-portal",
+    "severity": "high",
+    "title": "Schema migration timeout on support-portal database",
+    "description": "An online migration against support-portal in stage held table locks for over 20 minutes. Write traffic blocked and support tickets increased sharply.",
+    "resolution_summary": "Cancelled migration, applied changes in smaller batches, and scheduled remaining steps during a maintenance window.",
+    "tags": [
+      "database",
+      "latency",
+      "migration",
+      "third-party"
+    ]
+  },
+  {
+    "id": "INC-00108",
+    "created_at": "2026-04-30T00:13:21Z",
+    "environment": "prod",
+    "service": "mobile-backend",
+    "severity": "high",
+    "title": "Log pipeline drop causing blind spots for mobile-backend",
+    "description": "Log shipping from mobile-backend in prod fell to near zero. On-call engineers lost visibility while customer-impacting errors continued.",
+    "resolution_summary": "Restarted log agents and increased buffer limits. Added alerts on ingest rate anomalies per service.",
+    "tags": [
+      "disk",
+      "monitoring",
+      "queue",
+      "rate-limit"
+    ]
+  },
+  {
+    "id": "INC-00109",
+    "created_at": "2026-03-06T05:06:53Z",
+    "environment": "dev",
+    "service": "fraud-detection",
+    "severity": "critical",
+    "title": "Cold start latency regression on fraud-detection",
+    "description": "Serverless instances of fraud-detection in dev took up to 12 seconds to become ready. Autoscaling added capacity too slowly during a traffic burst.",
+    "resolution_summary": "Pre-warmed minimum instances and trimmed startup dependencies. Tuned autoscaling signals to react on queue depth.",
+    "tags": [
+      "deployment",
+      "latency",
+      "saturation"
+    ]
+  },
+  {
+    "id": "INC-00110",
+    "created_at": "2026-05-07T07:14:52Z",
+    "environment": "qa",
+    "service": "recommendation-engine",
+    "severity": "low",
+    "title": "Webhook delivery failures from recommendation-engine",
+    "description": "recommendation-engine in qa failed to deliver outbound webhooks after TLS cipher policy tightened. Partner integrations missed 42% of expected callbacks.",
+    "resolution_summary": "Restored compatible cipher suites and retried failed deliveries from the dead-letter store with idempotency keys.",
+    "tags": [
+      "disk",
+      "dns",
+      "ssl",
+      "third-party",
+      "webhook"
+    ]
+  },
+  {
+    "id": "INC-00111",
+    "created_at": "2026-05-20T16:39:04Z",
+    "environment": "stage",
+    "service": "webhook-dispatcher",
+    "severity": "low",
+    "title": "Session store unavailable for webhook-dispatcher",
+    "description": "Users were logged out repeatedly from webhook-dispatcher in stage. Session cluster nodes reported split-brain and rejected writes.",
+    "resolution_summary": "Forced quorum recovery, rebuilt replica set, and extended session TTL temporarily while caches repopulated.",
+    "tags": [
+      "auth",
+      "cache",
+      "failover"
+    ]
+  },
+  {
+    "id": "INC-00112",
+    "created_at": "2026-05-17T10:28:01Z",
+    "environment": "prod",
+    "service": "audit-logger",
+    "severity": "low",
+    "title": "CDN cache serving stale assets for audit-logger",
+    "description": "Customers saw outdated UI assets from audit-logger in prod. CDN purge jobs failed silently and edge nodes kept old bundles.",
+    "resolution_summary": "Issued manual global purge and fixed purge API credentials. Added post-deploy verification of asset hashes.",
+    "tags": [
+      "cache",
+      "config",
+      "deployment"
+    ]
+  },
+  {
+    "id": "INC-00113",
+    "created_at": "2026-05-18T09:46:59Z",
+    "environment": "dev",
+    "service": "image-resizer",
+    "severity": "medium",
+    "title": "Scheduled cron job failed on image-resizer",
+    "description": "A nightly reconciliation job for image-resizer in dev did not run for three days. Billing adjustments backlog grew to 37 thousand records.",
+    "resolution_summary": "Re-enabled cron scheduler after token expiry fix and backfilled missed runs with throttled batch workers.",
+    "tags": [
+      "cron",
+      "error-rate",
+      "graphql",
+      "queue",
+      "ssl"
+    ]
+  },
+  {
+    "id": "INC-00114",
+    "created_at": "2026-05-20T03:27:18Z",
+    "environment": "qa",
+    "service": "subscription-manager",
+    "severity": "critical",
+    "title": "Secrets rotation broke subscription-manager credentials",
+    "description": "Automated secret rotation updated database credentials for subscription-manager in qa but running pods kept stale values. Connection errors spiked across all zones.",
+    "resolution_summary": "Triggered rolling restart after rotation and wired secret reload hooks into the deployment controller.",
+    "tags": [
+      "database",
+      "deployment",
+      "error-rate",
+      "secrets"
+    ]
+  },
+  {
+    "id": "INC-00115",
+    "created_at": "2026-01-14T05:49:50Z",
+    "environment": "stage",
+    "service": "geo-routing-service",
+    "severity": "high",
+    "title": "GraphQL N+1 query storm on geo-routing-service",
+    "description": "A new client release issued deeply nested GraphQL queries against geo-routing-service in stage. Database CPU hit 14% and API latency exceeded SLOs.",
+    "resolution_summary": "Added query cost limits and DataLoader batching for hot resolvers. Blocked offending client version at the gateway.",
+    "tags": [
+      "database",
+      "graphql",
+      "latency"
+    ]
+  },
+  {
+    "id": "INC-00116",
+    "created_at": "2026-05-08T04:44:35Z",
+    "environment": "prod",
+    "service": "document-parser",
+    "severity": "high",
+    "title": "Load test accidentally run against document-parser in prod",
+    "description": "Engineering triggered a load test profile against live document-parser in prod. Synthetic traffic overwhelmed production pools and displaced real user sessions.",
+    "resolution_summary": "Stopped the test harness, restored traffic routing, and enforced environment guardrails in the load testing tool.",
+    "tags": [
+      "config",
+      "incident-response",
+      "saturation"
+    ]
+  },
+  {
+    "id": "INC-00117",
+    "created_at": "2026-06-30T13:41:50Z",
+    "environment": "dev",
+    "service": "metrics-collector",
+    "severity": "low",
+    "title": "Timezone handling bug in metrics-collector reports",
+    "description": "Daily aggregation jobs for metrics-collector in dev shifted boundaries after DST change. Financial reports showed duplicate and missing transactions.",
+    "resolution_summary": "Patched timezone conversion to use UTC internally and rebuilt affected report partitions.",
+    "tags": [
+      "config",
+      "cron",
+      "data-corruption",
+      "networking",
+      "webhook"
+    ]
+  },
+  {
+    "id": "INC-00118",
+    "created_at": "2026-03-28T02:31:02Z",
+    "environment": "qa",
+    "service": "feature-flags-service",
+    "severity": "low",
+    "title": "Race condition caused duplicate charges in feature-flags-service",
+    "description": "Concurrent requests to feature-flags-service in qa bypassed idempotency checks under retry storms. Approximately 36 customers received duplicate charges.",
+    "resolution_summary": "Deployed distributed lock around payment intent creation and issued refunds for affected transactions.",
+    "tags": [
+      "api",
+      "database",
+      "error-rate"
+    ]
+  },
+  {
+    "id": "INC-00119",
+    "created_at": "2026-07-01T20:05:46Z",
+    "environment": "stage",
+    "service": "session-store",
+    "severity": "high",
+    "title": "File upload failures on session-store storage backend",
+    "description": "Multipart uploads to session-store in stage failed with 403 errors. Object storage IAM policy changes blocked the service account used by the API tier.",
+    "resolution_summary": "Restored storage permissions and added policy diff checks to infrastructure CI before apply.",
+    "tags": [
+      "auth",
+      "config",
+      "storage"
+    ]
+  },
+  {
+    "id": "INC-00120",
+    "created_at": "2026-02-12T15:41:28Z",
+    "environment": "prod",
+    "service": "email-gateway",
+    "severity": "low",
+    "title": "Email delivery backlog from email-gateway",
+    "description": "Transactional emails from email-gateway in prod queued for over six hours. Provider rate limits were exceeded during a marketing campaign overlap.",
+    "resolution_summary": "Throttled bulk sends, prioritized password-reset traffic, and negotiated temporary provider limit increase.",
+    "tags": [
+      "kubernetes",
+      "latency",
+      "migration",
+      "queue",
+      "third-party"
+    ]
+  },
+  {
+    "id": "INC-00121",
+    "created_at": "2026-02-26T21:20:53Z",
+    "environment": "dev",
+    "service": "payment-api",
+    "severity": "critical",
+    "title": "payment-api returning 503 errors in dev",
+    "description": "Users reported widespread failures when calling payment-api. Error rate spiked to 40% in dev. Logs show upstream connection timeouts and circuit breaker trips.",
+    "resolution_summary": "Scaled payment-api replicas and restarted unhealthy pods. Root cause was connection pool exhaustion under peak load.",
+    "tags": [
+      "api",
+      "error-rate",
+      "timeout"
+    ]
+  },
+  {
+    "id": "INC-00122",
+    "created_at": "2026-06-14T02:52:19Z",
+    "environment": "qa",
+    "service": "user-auth",
+    "severity": "low",
+    "title": "Database connection pool exhausted on user-auth",
+    "description": "Monitoring alerted on user-auth in qa: all database connections in use. Queries queued and request latency exceeded 30 seconds.",
+    "resolution_summary": "Increased pool size and terminated long-running queries. Added index on hot table to reduce lock contention.",
+    "tags": [
+      "database",
+      "latency",
+      "third-party",
+      "timeout"
+    ]
+  },
+  {
+    "id": "INC-00123",
+    "created_at": "2026-05-08T11:10:00Z",
+    "environment": "stage",
+    "service": "notification-service",
+    "severity": "medium",
+    "title": "Authentication failures after notification-service deploy",
+    "description": "Following a deployment to stage, notification-service began rejecting valid tokens. Login success rate dropped sharply across regions.",
+    "resolution_summary": "Rolled back the deployment and rotated signing keys. Updated config validation to catch mismatched issuer URLs.",
+    "tags": [
+      "auth",
+      "config",
+      "deployment",
+      "kubernetes",
+      "webhook"
+    ]
+  },
+  {
+    "id": "INC-00124",
+    "created_at": "2026-06-02T21:41:07Z",
+    "environment": "prod",
+    "service": "inventory-db",
+    "severity": "low",
+    "title": "Memory leak detected in inventory-db (prod)",
+    "description": "Heap usage on inventory-db climbed steadily over 48 hours in prod. OOM kills restarted pods every few hours.",
+    "resolution_summary": "Identified unclosed cache entries in recent release. Hotfixed memory cleanup and scheduled full redeploy.",
+    "tags": [
+      "api",
+      "ddos",
+      "deployment",
+      "memory"
+    ]
+  },
+  {
+    "id": "INC-00125",
+    "created_at": "2026-06-21T14:02:41Z",
+    "environment": "dev",
+    "service": "checkout-frontend",
+    "severity": "medium",
+    "title": "Redis cache miss storm impacting checkout-frontend",
+    "description": "checkout-frontend in dev experienced a cache stampede after TTL expiry. Database load surged and p99 latency degraded.",
+    "resolution_summary": "Enabled request coalescing and staggered cache TTLs. Warmed critical keys before peak traffic.",
+    "tags": [
+      "cache",
+      "database",
+      "latency",
+      "queue",
+      "rollback"
+    ]
+  },
+  {
+    "id": "INC-00126",
+    "created_at": "2026-02-24T22:57:59Z",
+    "environment": "qa",
+    "service": "order-processor",
+    "severity": "low",
+    "title": "SSL certificate expiry on order-processor load balancer",
+    "description": "Clients could not reach order-processor in qa due to an expired TLS certificate on the load balancer.",
+    "resolution_summary": "Renewed certificate and updated auto-renewal alerts. Verified chain trust across all edge nodes.",
+    "tags": [
+      "config",
+      "ddos",
+      "networking",
+      "ssl"
+    ]
+  },
+  {
+    "id": "INC-00127",
+    "created_at": "2026-02-24T00:49:09Z",
+    "environment": "stage",
+    "service": "search-indexer",
+    "severity": "critical",
+    "title": "Message queue backlog on search-indexer",
+    "description": "Consumer lag on search-indexer in stage exceeded one million messages. Downstream order processing stalled.",
+    "resolution_summary": "Scaled consumer workers and replayed dead-letter queue. Fixed poison message handler that blocked partition reads.",
+    "tags": [
+      "config",
+      "error-rate",
+      "latency",
+      "queue"
+    ]
+  },
+  {
+    "id": "INC-00128",
+    "created_at": "2026-01-25T03:31:08Z",
+    "environment": "prod",
+    "service": "analytics-pipeline",
+    "severity": "medium",
+    "title": "Rate limiting misconfiguration on analytics-pipeline",
+    "description": "Legitimate traffic to analytics-pipeline in prod was throttled after a config change lowered rate limits too aggressively.",
+    "resolution_summary": "Restored previous rate limit thresholds and added staged rollout for gateway policy updates.",
+    "tags": [
+      "api",
+      "config",
+      "rate-limit"
+    ]
+  },
+  {
+    "id": "INC-00129",
+    "created_at": "2026-03-24T21:04:25Z",
+    "environment": "dev",
+    "service": "cdn-edge",
+    "severity": "high",
+    "title": "Disk space critical on cdn-edge nodes",
+    "description": "Several cdn-edge hosts in dev reached 98% disk usage. Log rotation failed and write operations began failing.",
+    "resolution_summary": "Expanded volumes and purged stale audit logs. Tuned log retention and added disk usage alerts.",
+    "tags": [
+      "cache",
+      "deployment",
+      "disk",
+      "error-rate",
+      "failover"
+    ]
+  },
+  {
+    "id": "INC-00130",
+    "created_at": "2026-03-31T01:25:28Z",
+    "environment": "qa",
+    "service": "billing-service",
+    "severity": "high",
+    "title": "Intermittent network partition affecting billing-service",
+    "description": "billing-service in qa lost connectivity to a dependency zone for 12 minutes. Retries caused retry storms across services.",
+    "resolution_summary": "Network team restored BGP routing. Added jittered backoff and bulkhead isolation between dependency calls.",
+    "tags": [
+      "api",
+      "config",
+      "networking",
+      "timeout"
+    ]
+  },
+  {
+    "id": "INC-00131",
+    "created_at": "2026-01-21T14:10:45Z",
+    "environment": "stage",
+    "service": "support-portal",
+    "severity": "low",
+    "title": "DNS resolution failures for support-portal in stage",
+    "description": "Internal clients failed to resolve the support-portal hostname in stage. Resolver timeouts caused cascading health check failures across dependent services.",
+    "resolution_summary": "Fixed stale NS records and reduced negative cache TTL. Added synthetic DNS probes to catch resolver drift early.",
+    "tags": [
+      "dns",
+      "monitoring",
+      "networking"
+    ]
+  },
+  {
+    "id": "INC-00132",
+    "created_at": "2026-07-04T04:51:10Z",
+    "environment": "prod",
+    "service": "mobile-backend",
+    "severity": "low",
+    "title": "Pod crash loop on mobile-backend after config rollout",
+    "description": "mobile-backend pods in prod entered CrashLoopBackOff after a config map update. Startup probes never passed and traffic shift stalled at 29% capacity.",
+    "resolution_summary": "Reverted config map and patched invalid environment variable references. Added schema validation to the deploy pipeline.",
+    "tags": [
+      "config",
+      "deployment",
+      "failover",
+      "kubernetes",
+      "timeout"
+    ]
+  },
+  {
+    "id": "INC-00133",
+    "created_at": "2026-01-10T15:28:39Z",
+    "environment": "dev",
+    "service": "fraud-detection",
+    "severity": "low",
+    "title": "Third-party API outage blocking fraud-detection",
+    "description": "fraud-detection in dev depends on an external vendor API that returned sustained 502 responses. Fallback logic did not activate and checkout flows failed.",
+    "resolution_summary": "Enabled degraded-mode responses and cached last-known-good data. Opened vendor ticket and documented failover runbook steps.",
+    "tags": [
+      "api",
+      "disk",
+      "failover",
+      "third-party"
+    ]
+  },
+  {
+    "id": "INC-00134",
+    "created_at": "2026-04-24T00:17:22Z",
+    "environment": "qa",
+    "service": "recommendation-engine",
+    "severity": "low",
+    "title": "Suspected data corruption in recommendation-engine records",
+    "description": "Support escalations reported inconsistent account states served by recommendation-engine in qa. Audit sampling found mismatched version fields on 31% of recent writes.",
+    "resolution_summary": "Paused write path, restored from point-in-time backup, and replayed events through a repaired serializer.",
+    "tags": [
+      "data-corruption",
+      "database",
+      "migration",
+      "rollback",
+      "third-party"
+    ]
+  },
+  {
+    "id": "INC-00135",
+    "created_at": "2026-02-21T02:34:44Z",
+    "environment": "stage",
+    "service": "webhook-dispatcher",
+    "severity": "high",
+    "title": "DDoS traffic spike targeting webhook-dispatcher",
+    "description": "Edge metrics showed a 36\u00d7 increase in anonymous requests against webhook-dispatcher in stage. Origin CPU saturated and legitimate users saw elevated error rates.",
+    "resolution_summary": "Activated WAF rules and geo-fenced suspicious ASNs. Scaled edge capacity and enabled challenge mode for abusive IPs.",
+    "tags": [
+      "ddos",
+      "networking",
+      "rate-limit",
+      "saturation"
+    ]
+  },
+  {
+    "id": "INC-00136",
+    "created_at": "2026-03-26T00:12:21Z",
+    "environment": "prod",
+    "service": "audit-logger",
+    "severity": "low",
+    "title": "Feature flag misconfiguration in audit-logger",
+    "description": "A flag rollout enabled experimental code for all tenants on audit-logger in prod. Error dashboards spiked within minutes of the change.",
+    "resolution_summary": "Disabled the flag globally and restricted future rollouts to canary cohorts with automatic rollback thresholds.",
+    "tags": [
+      "config",
+      "deployment",
+      "error-rate",
+      "third-party"
+    ]
+  },
+  {
+    "id": "INC-00137",
+    "created_at": "2026-06-21T17:02:25Z",
+    "environment": "dev",
+    "service": "image-resizer",
+    "severity": "low",
+    "title": "Schema migration timeout on image-resizer database",
+    "description": "An online migration against image-resizer in dev held table locks for over 20 minutes. Write traffic blocked and support tickets increased sharply.",
+    "resolution_summary": "Cancelled migration, applied changes in smaller batches, and scheduled remaining steps during a maintenance window.",
+    "tags": [
+      "cache",
+      "database",
+      "latency",
+      "migration"
+    ]
+  },
+  {
+    "id": "INC-00138",
+    "created_at": "2026-05-04T10:25:12Z",
+    "environment": "qa",
+    "service": "subscription-manager",
+    "severity": "critical",
+    "title": "Log pipeline drop causing blind spots for subscription-manager",
+    "description": "Log shipping from subscription-manager in qa fell to near zero. On-call engineers lost visibility while customer-impacting errors continued.",
+    "resolution_summary": "Restarted log agents and increased buffer limits. Added alerts on ingest rate anomalies per service.",
+    "tags": [
+      "disk",
+      "monitoring",
+      "queue",
+      "storage",
+      "timeout"
+    ]
+  },
+  {
+    "id": "INC-00139",
+    "created_at": "2026-02-04T20:24:19Z",
+    "environment": "stage",
+    "service": "geo-routing-service",
+    "severity": "critical",
+    "title": "Cold start latency regression on geo-routing-service",
+    "description": "Serverless instances of geo-routing-service in stage took up to 12 seconds to become ready. Autoscaling added capacity too slowly during a traffic burst.",
+    "resolution_summary": "Pre-warmed minimum instances and trimmed startup dependencies. Tuned autoscaling signals to react on queue depth.",
+    "tags": [
+      "deployment",
+      "latency",
+      "networking",
+      "saturation"
+    ]
+  },
+  {
+    "id": "INC-00140",
+    "created_at": "2026-03-24T02:45:07Z",
+    "environment": "prod",
+    "service": "document-parser",
+    "severity": "critical",
+    "title": "Webhook delivery failures from document-parser",
+    "description": "document-parser in prod failed to deliver outbound webhooks after TLS cipher policy tightened. Partner integrations missed 21% of expected callbacks.",
+    "resolution_summary": "Restored compatible cipher suites and retried failed deliveries from the dead-letter store with idempotency keys.",
+    "tags": [
+      "networking",
+      "ssl",
+      "third-party",
+      "webhook"
+    ]
+  },
+  {
+    "id": "INC-00141",
+    "created_at": "2026-03-16T00:51:59Z",
+    "environment": "dev",
+    "service": "metrics-collector",
+    "severity": "low",
+    "title": "Session store unavailable for metrics-collector",
+    "description": "Users were logged out repeatedly from metrics-collector in dev. Session cluster nodes reported split-brain and rejected writes.",
+    "resolution_summary": "Forced quorum recovery, rebuilt replica set, and extended session TTL temporarily while caches repopulated.",
+    "tags": [
+      "auth",
+      "cache",
+      "disk",
+      "failover"
+    ]
+  },
+  {
+    "id": "INC-00142",
+    "created_at": "2026-06-20T14:58:00Z",
+    "environment": "qa",
+    "service": "feature-flags-service",
+    "severity": "low",
+    "title": "CDN cache serving stale assets for feature-flags-service",
+    "description": "Customers saw outdated UI assets from feature-flags-service in qa. CDN purge jobs failed silently and edge nodes kept old bundles.",
+    "resolution_summary": "Issued manual global purge and fixed purge API credentials. Added post-deploy verification of asset hashes.",
+    "tags": [
+      "cache",
+      "config",
+      "deployment"
+    ]
+  },
+  {
+    "id": "INC-00143",
+    "created_at": "2026-06-03T22:42:21Z",
+    "environment": "stage",
+    "service": "session-store",
+    "severity": "low",
+    "title": "Scheduled cron job failed on session-store",
+    "description": "A nightly reconciliation job for session-store in stage did not run for three days. Billing adjustments backlog grew to 6 thousand records.",
+    "resolution_summary": "Re-enabled cron scheduler after token expiry fix and backfilled missed runs with throttled batch workers.",
+    "tags": [
+      "config",
+      "cron",
+      "database",
+      "error-rate",
+      "queue"
+    ]
+  },
+  {
+    "id": "INC-00144",
+    "created_at": "2026-06-10T04:48:35Z",
+    "environment": "prod",
+    "service": "email-gateway",
+    "severity": "high",
+    "title": "Secrets rotation broke email-gateway credentials",
+    "description": "Automated secret rotation updated database credentials for email-gateway in prod but running pods kept stale values. Connection errors spiked across all zones.",
+    "resolution_summary": "Triggered rolling restart after rotation and wired secret reload hooks into the deployment controller.",
+    "tags": [
+      "api",
+      "database",
+      "deployment",
+      "rollback",
+      "secrets"
+    ]
+  },
+  {
+    "id": "INC-00145",
+    "created_at": "2026-02-17T05:05:17Z",
+    "environment": "dev",
+    "service": "payment-api",
+    "severity": "critical",
+    "title": "GraphQL N+1 query storm on payment-api",
+    "description": "A new client release issued deeply nested GraphQL queries against payment-api in dev. Database CPU hit 20% and API latency exceeded SLOs.",
+    "resolution_summary": "Added query cost limits and DataLoader batching for hot resolvers. Blocked offending client version at the gateway.",
+    "tags": [
+      "database",
+      "graphql",
+      "latency"
+    ]
+  },
+  {
+    "id": "INC-00146",
+    "created_at": "2026-02-03T00:13:56Z",
+    "environment": "qa",
+    "service": "user-auth",
+    "severity": "high",
+    "title": "Load test accidentally run against user-auth in qa",
+    "description": "Engineering triggered a load test profile against live user-auth in qa. Synthetic traffic overwhelmed production pools and displaced real user sessions.",
+    "resolution_summary": "Stopped the test harness, restored traffic routing, and enforced environment guardrails in the load testing tool.",
+    "tags": [
+      "config",
+      "graphql",
+      "incident-response",
+      "saturation"
+    ]
+  },
+  {
+    "id": "INC-00147",
+    "created_at": "2026-02-20T19:47:18Z",
+    "environment": "stage",
+    "service": "notification-service",
+    "severity": "critical",
+    "title": "Timezone handling bug in notification-service reports",
+    "description": "Daily aggregation jobs for notification-service in stage shifted boundaries after DST change. Financial reports showed duplicate and missing transactions.",
+    "resolution_summary": "Patched timezone conversion to use UTC internally and rebuilt affected report partitions.",
+    "tags": [
+      "config",
+      "cron",
+      "data-corruption",
+      "third-party"
+    ]
+  },
+  {
+    "id": "INC-00148",
+    "created_at": "2026-02-11T01:57:14Z",
+    "environment": "prod",
+    "service": "inventory-db",
+    "severity": "medium",
+    "title": "Race condition caused duplicate charges in inventory-db",
+    "description": "Concurrent requests to inventory-db in prod bypassed idempotency checks under retry storms. Approximately 28 customers received duplicate charges.",
+    "resolution_summary": "Deployed distributed lock around payment intent creation and issued refunds for affected transactions.",
+    "tags": [
+      "api",
+      "database",
+      "error-rate",
+      "graphql",
+      "monitoring"
+    ]
+  },
+  {
+    "id": "INC-00149",
+    "created_at": "2026-03-10T21:32:47Z",
+    "environment": "dev",
+    "service": "checkout-frontend",
+    "severity": "critical",
+    "title": "File upload failures on checkout-frontend storage backend",
+    "description": "Multipart uploads to checkout-frontend in dev failed with 403 errors. Object storage IAM policy changes blocked the service account used by the API tier.",
+    "resolution_summary": "Restored storage permissions and added policy diff checks to infrastructure CI before apply.",
+    "tags": [
+      "auth",
+      "config",
+      "storage"
+    ]
+  },
+  {
+    "id": "INC-00150",
+    "created_at": "2026-05-01T07:24:26Z",
+    "environment": "qa",
+    "service": "order-processor",
+    "severity": "critical",
+    "title": "Email delivery backlog from order-processor",
+    "description": "Transactional emails from order-processor in qa queued for over six hours. Provider rate limits were exceeded during a marketing campaign overlap.",
+    "resolution_summary": "Throttled bulk sends, prioritized password-reset traffic, and negotiated temporary provider limit increase.",
+    "tags": [
+      "failover",
+      "latency",
+      "queue",
+      "rate-limit",
+      "third-party"
+    ]
+  },
+  {
+    "id": "INC-00151",
+    "created_at": "2026-05-04T11:22:33Z",
+    "environment": "stage",
+    "service": "search-indexer",
+    "severity": "high",
+    "title": "search-indexer returning 503 errors in stage",
+    "description": "Users reported widespread failures when calling search-indexer. Error rate spiked to 9% in stage. Logs show upstream connection timeouts and circuit breaker trips.",
+    "resolution_summary": "Scaled search-indexer replicas and restarted unhealthy pods. Root cause was connection pool exhaustion under peak load.",
+    "tags": [
+      "api",
+      "data-corruption",
+      "error-rate",
+      "storage",
+      "timeout"
+    ]
+  },
+  {
+    "id": "INC-00152",
+    "created_at": "2026-05-24T21:09:17Z",
+    "environment": "prod",
+    "service": "analytics-pipeline",
+    "severity": "high",
+    "title": "Database connection pool exhausted on analytics-pipeline",
+    "description": "Monitoring alerted on analytics-pipeline in prod: all database connections in use. Queries queued and request latency exceeded 30 seconds.",
+    "resolution_summary": "Increased pool size and terminated long-running queries. Added index on hot table to reduce lock contention.",
+    "tags": [
+      "database",
+      "incident-response",
+      "latency",
+      "timeout"
+    ]
+  },
+  {
+    "id": "INC-00153",
+    "created_at": "2026-06-10T11:20:42Z",
+    "environment": "dev",
+    "service": "cdn-edge",
+    "severity": "critical",
+    "title": "Authentication failures after cdn-edge deploy",
+    "description": "Following a deployment to dev, cdn-edge began rejecting valid tokens. Login success rate dropped sharply across regions.",
+    "resolution_summary": "Rolled back the deployment and rotated signing keys. Updated config validation to catch mismatched issuer URLs.",
+    "tags": [
+      "auth",
+      "config",
+      "deployment"
+    ]
+  },
+  {
+    "id": "INC-00154",
+    "created_at": "2026-04-02T16:23:10Z",
+    "environment": "qa",
+    "service": "billing-service",
+    "severity": "medium",
+    "title": "Memory leak detected in billing-service (qa)",
+    "description": "Heap usage on billing-service climbed steadily over 48 hours in qa. OOM kills restarted pods every few hours.",
+    "resolution_summary": "Identified unclosed cache entries in recent release. Hotfixed memory cleanup and scheduled full redeploy.",
+    "tags": [
+      "api",
+      "cache",
+      "deployment",
+      "memory",
+      "rate-limit"
+    ]
+  },
+  {
+    "id": "INC-00155",
+    "created_at": "2026-06-23T11:18:33Z",
+    "environment": "stage",
+    "service": "support-portal",
+    "severity": "medium",
+    "title": "Redis cache miss storm impacting support-portal",
+    "description": "support-portal in stage experienced a cache stampede after TTL expiry. Database load surged and p99 latency degraded.",
+    "resolution_summary": "Enabled request coalescing and staggered cache TTLs. Warmed critical keys before peak traffic.",
+    "tags": [
+      "cache",
+      "data-corruption",
+      "database",
+      "latency"
+    ]
+  },
+  {
+    "id": "INC-00156",
+    "created_at": "2026-04-03T16:21:55Z",
+    "environment": "prod",
+    "service": "mobile-backend",
+    "severity": "low",
+    "title": "SSL certificate expiry on mobile-backend load balancer",
+    "description": "Clients could not reach mobile-backend in prod due to an expired TLS certificate on the load balancer.",
+    "resolution_summary": "Renewed certificate and updated auto-renewal alerts. Verified chain trust across all edge nodes.",
+    "tags": [
+      "config",
+      "networking",
+      "ssl",
+      "storage"
+    ]
+  },
+  {
+    "id": "INC-00157",
+    "created_at": "2026-04-04T01:31:01Z",
+    "environment": "dev",
+    "service": "fraud-detection",
+    "severity": "low",
+    "title": "Message queue backlog on fraud-detection",
+    "description": "Consumer lag on fraud-detection in dev exceeded one million messages. Downstream order processing stalled.",
+    "resolution_summary": "Scaled consumer workers and replayed dead-letter queue. Fixed poison message handler that blocked partition reads.",
+    "tags": [
+      "error-rate",
+      "latency",
+      "queue"
+    ]
+  },
+  {
+    "id": "INC-00158",
+    "created_at": "2026-06-15T10:28:52Z",
+    "environment": "qa",
+    "service": "recommendation-engine",
+    "severity": "medium",
+    "title": "Rate limiting misconfiguration on recommendation-engine",
+    "description": "Legitimate traffic to recommendation-engine in qa was throttled after a config change lowered rate limits too aggressively.",
+    "resolution_summary": "Restored previous rate limit thresholds and added staged rollout for gateway policy updates.",
+    "tags": [
+      "api",
+      "config",
+      "migration",
+      "rate-limit",
+      "rollback"
+    ]
+  },
+  {
+    "id": "INC-00159",
+    "created_at": "2026-06-18T20:12:07Z",
+    "environment": "stage",
+    "service": "webhook-dispatcher",
+    "severity": "low",
+    "title": "Disk space critical on webhook-dispatcher nodes",
+    "description": "Several webhook-dispatcher hosts in stage reached 98% disk usage. Log rotation failed and write operations began failing.",
+    "resolution_summary": "Expanded volumes and purged stale audit logs. Tuned log retention and added disk usage alerts.",
+    "tags": [
+      "deployment",
+      "disk",
+      "error-rate",
+      "queue",
+      "secrets"
+    ]
+  },
+  {
+    "id": "INC-00160",
+    "created_at": "2026-06-19T19:29:13Z",
+    "environment": "prod",
+    "service": "audit-logger",
+    "severity": "medium",
+    "title": "Intermittent network partition affecting audit-logger",
+    "description": "audit-logger in prod lost connectivity to a dependency zone for 12 minutes. Retries caused retry storms across services.",
+    "resolution_summary": "Network team restored BGP routing. Added jittered backoff and bulkhead isolation between dependency calls.",
+    "tags": [
+      "api",
+      "networking",
+      "timeout"
+    ]
+  },
+  {
+    "id": "INC-00161",
+    "created_at": "2026-02-25T20:29:09Z",
+    "environment": "dev",
+    "service": "image-resizer",
+    "severity": "medium",
+    "title": "DNS resolution failures for image-resizer in dev",
+    "description": "Internal clients failed to resolve the image-resizer hostname in dev. Resolver timeouts caused cascading health check failures across dependent services.",
+    "resolution_summary": "Fixed stale NS records and reduced negative cache TTL. Added synthetic DNS probes to catch resolver drift early.",
+    "tags": [
+      "cron",
+      "dns",
+      "monitoring",
+      "networking"
+    ]
+  },
+  {
+    "id": "INC-00162",
+    "created_at": "2026-01-15T01:45:06Z",
+    "environment": "qa",
+    "service": "subscription-manager",
+    "severity": "low",
+    "title": "Pod crash loop on subscription-manager after config rollout",
+    "description": "subscription-manager pods in qa entered CrashLoopBackOff after a config map update. Startup probes never passed and traffic shift stalled at 26% capacity.",
+    "resolution_summary": "Reverted config map and patched invalid environment variable references. Added schema validation to the deploy pipeline.",
+    "tags": [
+      "config",
+      "deployment",
+      "incident-response",
+      "kubernetes"
+    ]
+  },
+  {
+    "id": "INC-00163",
+    "created_at": "2026-04-14T04:08:50Z",
+    "environment": "stage",
+    "service": "geo-routing-service",
+    "severity": "medium",
+    "title": "Third-party API outage blocking geo-routing-service",
+    "description": "geo-routing-service in stage depends on an external vendor API that returned sustained 502 responses. Fallback logic did not activate and checkout flows failed.",
+    "resolution_summary": "Enabled degraded-mode responses and cached last-known-good data. Opened vendor ticket and documented failover runbook steps.",
+    "tags": [
+      "api",
+      "failover",
+      "third-party"
+    ]
+  },
+  {
+    "id": "INC-00164",
+    "created_at": "2026-03-16T14:05:38Z",
+    "environment": "prod",
+    "service": "document-parser",
+    "severity": "medium",
+    "title": "Suspected data corruption in document-parser records",
+    "description": "Support escalations reported inconsistent account states served by document-parser in prod. Audit sampling found mismatched version fields on 21% of recent writes.",
+    "resolution_summary": "Paused write path, restored from point-in-time backup, and replayed events through a repaired serializer.",
+    "tags": [
+      "cron",
+      "data-corruption",
+      "database",
+      "rollback"
+    ]
+  },
+  {
+    "id": "INC-00165",
+    "created_at": "2026-01-11T11:18:27Z",
+    "environment": "dev",
+    "service": "metrics-collector",
+    "severity": "medium",
+    "title": "DDoS traffic spike targeting metrics-collector",
+    "description": "Edge metrics showed a 40\u00d7 increase in anonymous requests against metrics-collector in dev. Origin CPU saturated and legitimate users saw elevated error rates.",
+    "resolution_summary": "Activated WAF rules and geo-fenced suspicious ASNs. Scaled edge capacity and enabled challenge mode for abusive IPs.",
+    "tags": [
+      "api",
+      "auth",
+      "ddos",
+      "networking",
+      "saturation"
+    ]
+  },
+  {
+    "id": "INC-00166",
+    "created_at": "2026-04-14T08:56:16Z",
+    "environment": "qa",
+    "service": "feature-flags-service",
+    "severity": "high",
+    "title": "Feature flag misconfiguration in feature-flags-service",
+    "description": "A flag rollout enabled experimental code for all tenants on feature-flags-service in qa. Error dashboards spiked within minutes of the change.",
+    "resolution_summary": "Disabled the flag globally and restricted future rollouts to canary cohorts with automatic rollback thresholds.",
+    "tags": [
+      "config",
+      "deployment",
+      "error-rate",
+      "latency",
+      "rollback"
+    ]
+  },
+  {
+    "id": "INC-00167",
+    "created_at": "2026-04-06T12:38:41Z",
+    "environment": "stage",
+    "service": "session-store",
+    "severity": "low",
+    "title": "Schema migration timeout on session-store database",
+    "description": "An online migration against session-store in stage held table locks for over 20 minutes. Write traffic blocked and support tickets increased sharply.",
+    "resolution_summary": "Cancelled migration, applied changes in smaller batches, and scheduled remaining steps during a maintenance window.",
+    "tags": [
+      "database",
+      "latency",
+      "migration"
+    ]
+  },
+  {
+    "id": "INC-00168",
+    "created_at": "2026-02-21T12:42:50Z",
+    "environment": "prod",
+    "service": "email-gateway",
+    "severity": "critical",
+    "title": "Log pipeline drop causing blind spots for email-gateway",
+    "description": "Log shipping from email-gateway in prod fell to near zero. On-call engineers lost visibility while customer-impacting errors continued.",
+    "resolution_summary": "Restarted log agents and increased buffer limits. Added alerts on ingest rate anomalies per service.",
+    "tags": [
+      "disk",
+      "monitoring",
+      "queue",
+      "third-party"
+    ]
+  },
+  {
+    "id": "INC-00169",
+    "created_at": "2026-05-18T10:16:40Z",
+    "environment": "dev",
+    "service": "payment-api",
+    "severity": "high",
+    "title": "Cold start latency regression on payment-api",
+    "description": "Serverless instances of payment-api in dev took up to 12 seconds to become ready. Autoscaling added capacity too slowly during a traffic burst.",
+    "resolution_summary": "Pre-warmed minimum instances and trimmed startup dependencies. Tuned autoscaling signals to react on queue depth.",
+    "tags": [
+      "config",
+      "ddos",
+      "deployment",
+      "latency",
+      "saturation"
+    ]
+  },
+  {
+    "id": "INC-00170",
+    "created_at": "2026-06-03T08:18:39Z",
+    "environment": "qa",
+    "service": "user-auth",
+    "severity": "medium",
+    "title": "Webhook delivery failures from user-auth",
+    "description": "user-auth in qa failed to deliver outbound webhooks after TLS cipher policy tightened. Partner integrations missed 32% of expected callbacks.",
+    "resolution_summary": "Restored compatible cipher suites and retried failed deliveries from the dead-letter store with idempotency keys.",
+    "tags": [
+      "disk",
+      "queue",
+      "ssl",
+      "third-party",
+      "webhook"
+    ]
+  },
+  {
+    "id": "INC-00171",
+    "created_at": "2026-03-10T00:58:00Z",
+    "environment": "stage",
+    "service": "notification-service",
+    "severity": "low",
+    "title": "Session store unavailable for notification-service",
+    "description": "Users were logged out repeatedly from notification-service in stage. Session cluster nodes reported split-brain and rejected writes.",
+    "resolution_summary": "Forced quorum recovery, rebuilt replica set, and extended session TTL temporarily while caches repopulated.",
+    "tags": [
+      "auth",
+      "cache",
+      "error-rate",
+      "failover"
+    ]
+  },
+  {
+    "id": "INC-00172",
+    "created_at": "2026-03-11T18:33:36Z",
+    "environment": "prod",
+    "service": "inventory-db",
+    "severity": "critical",
+    "title": "CDN cache serving stale assets for inventory-db",
+    "description": "Customers saw outdated UI assets from inventory-db in prod. CDN purge jobs failed silently and edge nodes kept old bundles.",
+    "resolution_summary": "Issued manual global purge and fixed purge API credentials. Added post-deploy verification of asset hashes.",
+    "tags": [
+      "cache",
+      "config",
+      "deployment"
+    ]
+  },
+  {
+    "id": "INC-00173",
+    "created_at": "2026-02-20T12:25:31Z",
+    "environment": "dev",
+    "service": "checkout-frontend",
+    "severity": "high",
+    "title": "Scheduled cron job failed on checkout-frontend",
+    "description": "A nightly reconciliation job for checkout-frontend in dev did not run for three days. Billing adjustments backlog grew to 17 thousand records.",
+    "resolution_summary": "Re-enabled cron scheduler after token expiry fix and backfilled missed runs with throttled batch workers.",
+    "tags": [
+      "cron",
+      "ddos",
+      "error-rate",
+      "latency",
+      "queue"
+    ]
+  },
+  {
+    "id": "INC-00174",
+    "created_at": "2026-06-20T04:19:45Z",
+    "environment": "qa",
+    "service": "order-processor",
+    "severity": "medium",
+    "title": "Secrets rotation broke order-processor credentials",
+    "description": "Automated secret rotation updated database credentials for order-processor in qa but running pods kept stale values. Connection errors spiked across all zones.",
+    "resolution_summary": "Triggered rolling restart after rotation and wired secret reload hooks into the deployment controller.",
+    "tags": [
+      "database",
+      "deployment",
+      "secrets"
+    ]
+  },
+  {
+    "id": "INC-00175",
+    "created_at": "2026-03-20T13:49:39Z",
+    "environment": "stage",
+    "service": "search-indexer",
+    "severity": "medium",
+    "title": "GraphQL N+1 query storm on search-indexer",
+    "description": "A new client release issued deeply nested GraphQL queries against search-indexer in stage. Database CPU hit 19% and API latency exceeded SLOs.",
+    "resolution_summary": "Added query cost limits and DataLoader batching for hot resolvers. Blocked offending client version at the gateway.",
+    "tags": [
+      "database",
+      "graphql",
+      "latency"
+    ]
+  },
+  {
+    "id": "INC-00176",
+    "created_at": "2026-05-26T23:36:19Z",
+    "environment": "prod",
+    "service": "analytics-pipeline",
+    "severity": "medium",
+    "title": "Load test accidentally run against analytics-pipeline in prod",
+    "description": "Engineering triggered a load test profile against live analytics-pipeline in prod. Synthetic traffic overwhelmed production pools and displaced real user sessions.",
+    "resolution_summary": "Stopped the test harness, restored traffic routing, and enforced environment guardrails in the load testing tool.",
+    "tags": [
+      "config",
+      "deployment",
+      "incident-response",
+      "latency",
+      "saturation"
+    ]
+  },
+  {
+    "id": "INC-00177",
+    "created_at": "2026-04-26T22:50:22Z",
+    "environment": "dev",
+    "service": "cdn-edge",
+    "severity": "critical",
+    "title": "Timezone handling bug in cdn-edge reports",
+    "description": "Daily aggregation jobs for cdn-edge in dev shifted boundaries after DST change. Financial reports showed duplicate and missing transactions.",
+    "resolution_summary": "Patched timezone conversion to use UTC internally and rebuilt affected report partitions.",
+    "tags": [
+      "config",
+      "cron",
+      "data-corruption",
+      "third-party"
+    ]
+  },
+  {
+    "id": "INC-00178",
+    "created_at": "2026-06-27T03:19:21Z",
+    "environment": "qa",
+    "service": "billing-service",
+    "severity": "high",
+    "title": "Race condition caused duplicate charges in billing-service",
+    "description": "Concurrent requests to billing-service in qa bypassed idempotency checks under retry storms. Approximately 45 customers received duplicate charges.",
+    "resolution_summary": "Deployed distributed lock around payment intent creation and issued refunds for affected transactions.",
+    "tags": [
+      "api",
+      "cache",
+      "database",
+      "error-rate"
+    ]
+  },
+  {
+    "id": "INC-00179",
+    "created_at": "2026-03-05T17:07:02Z",
+    "environment": "stage",
+    "service": "support-portal",
+    "severity": "critical",
+    "title": "File upload failures on support-portal storage backend",
+    "description": "Multipart uploads to support-portal in stage failed with 403 errors. Object storage IAM policy changes blocked the service account used by the API tier.",
+    "resolution_summary": "Restored storage permissions and added policy diff checks to infrastructure CI before apply.",
+    "tags": [
+      "auth",
+      "config",
+      "ddos",
+      "storage"
+    ]
+  },
+  {
+    "id": "INC-00180",
+    "created_at": "2026-02-14T07:11:49Z",
+    "environment": "prod",
+    "service": "mobile-backend",
+    "severity": "low",
+    "title": "Email delivery backlog from mobile-backend",
+    "description": "Transactional emails from mobile-backend in prod queued for over six hours. Provider rate limits were exceeded during a marketing campaign overlap.",
+    "resolution_summary": "Throttled bulk sends, prioritized password-reset traffic, and negotiated temporary provider limit increase.",
+    "tags": [
+      "latency",
+      "queue",
+      "third-party"
+    ]
+  },
+  {
+    "id": "INC-00181",
+    "created_at": "2026-01-31T15:41:04Z",
+    "environment": "dev",
+    "service": "fraud-detection",
+    "severity": "medium",
+    "title": "fraud-detection returning 503 errors in dev",
+    "description": "Users reported widespread failures when calling fraud-detection. Error rate spiked to 35% in dev. Logs show upstream connection timeouts and circuit breaker trips.",
+    "resolution_summary": "Scaled fraud-detection replicas and restarted unhealthy pods. Root cause was connection pool exhaustion under peak load.",
+    "tags": [
+      "api",
+      "error-rate",
+      "timeout"
+    ]
+  },
+  {
+    "id": "INC-00182",
+    "created_at": "2026-01-23T21:14:52Z",
+    "environment": "qa",
+    "service": "recommendation-engine",
+    "severity": "low",
+    "title": "Database connection pool exhausted on recommendation-engine",
+    "description": "Monitoring alerted on recommendation-engine in qa: all database connections in use. Queries queued and request latency exceeded 30 seconds.",
+    "resolution_summary": "Increased pool size and terminated long-running queries. Added index on hot table to reduce lock contention.",
+    "tags": [
+      "database",
+      "latency",
+      "storage",
+      "third-party",
+      "timeout"
+    ]
+  },
+  {
+    "id": "INC-00183",
+    "created_at": "2026-02-07T11:18:40Z",
+    "environment": "stage",
+    "service": "webhook-dispatcher",
+    "severity": "critical",
+    "title": "Authentication failures after webhook-dispatcher deploy",
+    "description": "Following a deployment to stage, webhook-dispatcher began rejecting valid tokens. Login success rate dropped sharply across regions.",
+    "resolution_summary": "Rolled back the deployment and rotated signing keys. Updated config validation to catch mismatched issuer URLs.",
+    "tags": [
+      "api",
+      "auth",
+      "config",
+      "deployment",
+      "queue"
+    ]
+  },
+  {
+    "id": "INC-00184",
+    "created_at": "2026-04-27T20:48:31Z",
+    "environment": "prod",
+    "service": "audit-logger",
+    "severity": "high",
+    "title": "Memory leak detected in audit-logger (prod)",
+    "description": "Heap usage on audit-logger climbed steadily over 48 hours in prod. OOM kills restarted pods every few hours.",
+    "resolution_summary": "Identified unclosed cache entries in recent release. Hotfixed memory cleanup and scheduled full redeploy.",
+    "tags": [
+      "api",
+      "deployment",
+      "graphql",
+      "memory"
+    ]
+  },
+  {
+    "id": "INC-00185",
+    "created_at": "2026-03-24T08:41:24Z",
+    "environment": "dev",
+    "service": "image-resizer",
+    "severity": "high",
+    "title": "Redis cache miss storm impacting image-resizer",
+    "description": "image-resizer in dev experienced a cache stampede after TTL expiry. Database load surged and p99 latency degraded.",
+    "resolution_summary": "Enabled request coalescing and staggered cache TTLs. Warmed critical keys before peak traffic.",
+    "tags": [
+      "cache",
+      "database",
+      "ddos",
+      "latency"
+    ]
+  },
+  {
+    "id": "INC-00186",
+    "created_at": "2026-04-02T18:29:30Z",
+    "environment": "qa",
+    "service": "subscription-manager",
+    "severity": "medium",
+    "title": "SSL certificate expiry on subscription-manager load balancer",
+    "description": "Clients could not reach subscription-manager in qa due to an expired TLS certificate on the load balancer.",
+    "resolution_summary": "Renewed certificate and updated auto-renewal alerts. Verified chain trust across all edge nodes.",
+    "tags": [
+      "config",
+      "networking",
+      "secrets",
+      "ssl"
+    ]
+  },
+  {
+    "id": "INC-00187",
+    "created_at": "2026-06-02T05:03:58Z",
+    "environment": "stage",
+    "service": "geo-routing-service",
+    "severity": "critical",
+    "title": "Message queue backlog on geo-routing-service",
+    "description": "Consumer lag on geo-routing-service in stage exceeded one million messages. Downstream order processing stalled.",
+    "resolution_summary": "Scaled consumer workers and replayed dead-letter queue. Fixed poison message handler that blocked partition reads.",
+    "tags": [
+      "error-rate",
+      "latency",
+      "queue"
+    ]
+  },
+  {
+    "id": "INC-00188",
+    "created_at": "2026-02-19T11:26:55Z",
+    "environment": "prod",
+    "service": "document-parser",
+    "severity": "high",
+    "title": "Rate limiting misconfiguration on document-parser",
+    "description": "Legitimate traffic to document-parser in prod was throttled after a config change lowered rate limits too aggressively.",
+    "resolution_summary": "Restored previous rate limit thresholds and added staged rollout for gateway policy updates.",
+    "tags": [
+      "api",
+      "config",
+      "rate-limit",
+      "third-party"
+    ]
+  },
+  {
+    "id": "INC-00189",
+    "created_at": "2026-02-25T01:51:09Z",
+    "environment": "dev",
+    "service": "metrics-collector",
+    "severity": "critical",
+    "title": "Disk space critical on metrics-collector nodes",
+    "description": "Several metrics-collector hosts in dev reached 98% disk usage. Log rotation failed and write operations began failing.",
+    "resolution_summary": "Expanded volumes and purged stale audit logs. Tuned log retention and added disk usage alerts.",
+    "tags": [
+      "deployment",
+      "disk",
+      "error-rate"
+    ]
+  },
+  {
+    "id": "INC-00190",
+    "created_at": "2026-01-10T00:28:11Z",
+    "environment": "qa",
+    "service": "feature-flags-service",
+    "severity": "critical",
+    "title": "Intermittent network partition affecting feature-flags-service",
+    "description": "feature-flags-service in qa lost connectivity to a dependency zone for 12 minutes. Retries caused retry storms across services.",
+    "resolution_summary": "Network team restored BGP routing. Added jittered backoff and bulkhead isolation between dependency calls.",
+    "tags": [
+      "api",
+      "ddos",
+      "networking",
+      "timeout"
+    ]
+  },
+  {
+    "id": "INC-00191",
+    "created_at": "2026-01-15T20:06:45Z",
+    "environment": "stage",
+    "service": "session-store",
+    "severity": "low",
+    "title": "DNS resolution failures for session-store in stage",
+    "description": "Internal clients failed to resolve the session-store hostname in stage. Resolver timeouts caused cascading health check failures across dependent services.",
+    "resolution_summary": "Fixed stale NS records and reduced negative cache TTL. Added synthetic DNS probes to catch resolver drift early.",
+    "tags": [
+      "dns",
+      "monitoring",
+      "networking"
+    ]
+  },
+  {
+    "id": "INC-00192",
+    "created_at": "2026-05-26T00:09:34Z",
+    "environment": "prod",
+    "service": "email-gateway",
+    "severity": "medium",
+    "title": "Pod crash loop on email-gateway after config rollout",
+    "description": "email-gateway pods in prod entered CrashLoopBackOff after a config map update. Startup probes never passed and traffic shift stalled at 23% capacity.",
+    "resolution_summary": "Reverted config map and patched invalid environment variable references. Added schema validation to the deploy pipeline.",
+    "tags": [
+      "api",
+      "config",
+      "deployment",
+      "kubernetes"
+    ]
+  },
+  {
+    "id": "INC-00193",
+    "created_at": "2026-06-11T11:32:40Z",
+    "environment": "dev",
+    "service": "payment-api",
+    "severity": "high",
+    "title": "Third-party API outage blocking payment-api",
+    "description": "payment-api in dev depends on an external vendor API that returned sustained 502 responses. Fallback logic did not activate and checkout flows failed.",
+    "resolution_summary": "Enabled degraded-mode responses and cached last-known-good data. Opened vendor ticket and documented failover runbook steps.",
+    "tags": [
+      "api",
+      "failover",
+      "graphql",
+      "third-party",
+      "webhook"
+    ]
+  },
+  {
+    "id": "INC-00194",
+    "created_at": "2026-01-31T18:53:46Z",
+    "environment": "qa",
+    "service": "user-auth",
+    "severity": "high",
+    "title": "Suspected data corruption in user-auth records",
+    "description": "Support escalations reported inconsistent account states served by user-auth in qa. Audit sampling found mismatched version fields on 32% of recent writes.",
+    "resolution_summary": "Paused write path, restored from point-in-time backup, and replayed events through a repaired serializer.",
+    "tags": [
+      "data-corruption",
+      "database",
+      "latency",
+      "rollback",
+      "secrets"
+    ]
+  },
+  {
+    "id": "INC-00195",
+    "created_at": "2026-06-19T00:22:49Z",
+    "environment": "stage",
+    "service": "notification-service",
+    "severity": "high",
+    "title": "DDoS traffic spike targeting notification-service",
+    "description": "Edge metrics showed a 22\u00d7 increase in anonymous requests against notification-service in stage. Origin CPU saturated and legitimate users saw elevated error rates.",
+    "resolution_summary": "Activated WAF rules and geo-fenced suspicious ASNs. Scaled edge capacity and enabled challenge mode for abusive IPs.",
+    "tags": [
+      "ddos",
+      "networking",
+      "saturation"
+    ]
+  },
+  {
+    "id": "INC-00196",
+    "created_at": "2026-02-10T17:15:22Z",
+    "environment": "prod",
+    "service": "inventory-db",
+    "severity": "critical",
+    "title": "Feature flag misconfiguration in inventory-db",
+    "description": "A flag rollout enabled experimental code for all tenants on inventory-db in prod. Error dashboards spiked within minutes of the change.",
+    "resolution_summary": "Disabled the flag globally and restricted future rollouts to canary cohorts with automatic rollback thresholds.",
+    "tags": [
+      "config",
+      "deployment",
+      "error-rate",
+      "graphql"
+    ]
+  },
+  {
+    "id": "INC-00197",
+    "created_at": "2026-02-02T15:31:48Z",
+    "environment": "dev",
+    "service": "checkout-frontend",
+    "severity": "medium",
+    "title": "Schema migration timeout on checkout-frontend database",
+    "description": "An online migration against checkout-frontend in dev held table locks for over 20 minutes. Write traffic blocked and support tickets increased sharply.",
+    "resolution_summary": "Cancelled migration, applied changes in smaller batches, and scheduled remaining steps during a maintenance window.",
+    "tags": [
+      "database",
+      "failover",
+      "latency",
+      "migration"
+    ]
+  },
+  {
+    "id": "INC-00198",
+    "created_at": "2026-03-03T08:45:33Z",
+    "environment": "qa",
+    "service": "order-processor",
+    "severity": "medium",
+    "title": "Log pipeline drop causing blind spots for order-processor",
+    "description": "Log shipping from order-processor in qa fell to near zero. On-call engineers lost visibility while customer-impacting errors continued.",
+    "resolution_summary": "Restarted log agents and increased buffer limits. Added alerts on ingest rate anomalies per service.",
+    "tags": [
+      "ddos",
+      "disk",
+      "monitoring",
+      "queue",
+      "webhook"
+    ]
+  },
+  {
+    "id": "INC-00199",
+    "created_at": "2026-05-05T15:03:10Z",
+    "environment": "stage",
+    "service": "search-indexer",
+    "severity": "low",
+    "title": "Cold start latency regression on search-indexer",
+    "description": "Serverless instances of search-indexer in stage took up to 12 seconds to become ready. Autoscaling added capacity too slowly during a traffic burst.",
+    "resolution_summary": "Pre-warmed minimum instances and trimmed startup dependencies. Tuned autoscaling signals to react on queue depth.",
+    "tags": [
+      "deployment",
+      "latency",
+      "saturation"
+    ]
+  },
+  {
+    "id": "INC-00200",
+    "created_at": "2026-05-06T17:30:34Z",
+    "environment": "prod",
+    "service": "analytics-pipeline",
+    "severity": "low",
+    "title": "Webhook delivery failures from analytics-pipeline",
+    "description": "analytics-pipeline in prod failed to deliver outbound webhooks after TLS cipher policy tightened. Partner integrations missed 25% of expected callbacks.",
+    "resolution_summary": "Restored compatible cipher suites and retried failed deliveries from the dead-letter store with idempotency keys.",
+    "tags": [
+      "ssl",
+      "third-party",
+      "timeout",
+      "webhook"
+    ]
+  },
+  {
+    "id": "INC-00201",
+    "created_at": "2026-05-20T10:27:29Z",
+    "environment": "dev",
+    "service": "cdn-edge",
+    "severity": "critical",
+    "title": "Session store unavailable for cdn-edge",
+    "description": "Users were logged out repeatedly from cdn-edge in dev. Session cluster nodes reported split-brain and rejected writes.",
+    "resolution_summary": "Forced quorum recovery, rebuilt replica set, and extended session TTL temporarily while caches repopulated.",
+    "tags": [
+      "auth",
+      "cache",
+      "cron",
+      "failover",
+      "timeout"
+    ]
+  },
+  {
+    "id": "INC-00202",
+    "created_at": "2026-01-17T07:29:35Z",
+    "environment": "qa",
+    "service": "billing-service",
+    "severity": "medium",
+    "title": "CDN cache serving stale assets for billing-service",
+    "description": "Customers saw outdated UI assets from billing-service in qa. CDN purge jobs failed silently and edge nodes kept old bundles.",
+    "resolution_summary": "Issued manual global purge and fixed purge API credentials. Added post-deploy verification of asset hashes.",
+    "tags": [
+      "cache",
+      "config",
+      "deployment"
+    ]
+  },
+  {
+    "id": "INC-00203",
+    "created_at": "2026-05-16T00:15:15Z",
+    "environment": "stage",
+    "service": "support-portal",
+    "severity": "low",
+    "title": "Scheduled cron job failed on support-portal",
+    "description": "A nightly reconciliation job for support-portal in stage did not run for three days. Billing adjustments backlog grew to 38 thousand records.",
+    "resolution_summary": "Re-enabled cron scheduler after token expiry fix and backfilled missed runs with throttled batch workers.",
+    "tags": [
+      "cron",
+      "error-rate",
+      "latency",
+      "queue"
+    ]
+  },
+  {
+    "id": "INC-00204",
+    "created_at": "2026-04-04T03:22:16Z",
+    "environment": "prod",
+    "service": "mobile-backend",
+    "severity": "high",
+    "title": "Secrets rotation broke mobile-backend credentials",
+    "description": "Automated secret rotation updated database credentials for mobile-backend in prod but running pods kept stale values. Connection errors spiked across all zones.",
+    "resolution_summary": "Triggered rolling restart after rotation and wired secret reload hooks into the deployment controller.",
+    "tags": [
+      "data-corruption",
+      "database",
+      "ddos",
+      "deployment",
+      "secrets"
+    ]
+  },
+  {
+    "id": "INC-00205",
+    "created_at": "2026-03-18T01:36:57Z",
+    "environment": "dev",
+    "service": "fraud-detection",
+    "severity": "critical",
+    "title": "GraphQL N+1 query storm on fraud-detection",
+    "description": "A new client release issued deeply nested GraphQL queries against fraud-detection in dev. Database CPU hit 35% and API latency exceeded SLOs.",
+    "resolution_summary": "Added query cost limits and DataLoader batching for hot resolvers. Blocked offending client version at the gateway.",
+    "tags": [
+      "database",
+      "graphql",
+      "latency",
+      "ssl"
+    ]
+  },
+  {
+    "id": "INC-00206",
+    "created_at": "2026-06-25T01:19:33Z",
+    "environment": "qa",
+    "service": "recommendation-engine",
+    "severity": "medium",
+    "title": "Load test accidentally run against recommendation-engine in qa",
+    "description": "Engineering triggered a load test profile against live recommendation-engine in qa. Synthetic traffic overwhelmed production pools and displaced real user sessions.",
+    "resolution_summary": "Stopped the test harness, restored traffic routing, and enforced environment guardrails in the load testing tool.",
+    "tags": [
+      "config",
+      "incident-response",
+      "saturation"
+    ]
+  },
+  {
+    "id": "INC-00207",
+    "created_at": "2026-05-24T04:45:13Z",
+    "environment": "stage",
+    "service": "webhook-dispatcher",
+    "severity": "medium",
+    "title": "Timezone handling bug in webhook-dispatcher reports",
+    "description": "Daily aggregation jobs for webhook-dispatcher in stage shifted boundaries after DST change. Financial reports showed duplicate and missing transactions.",
+    "resolution_summary": "Patched timezone conversion to use UTC internally and rebuilt affected report partitions.",
+    "tags": [
+      "config",
+      "cron",
+      "data-corruption",
+      "error-rate"
+    ]
+  },
+  {
+    "id": "INC-00208",
+    "created_at": "2026-01-16T15:01:15Z",
+    "environment": "prod",
+    "service": "audit-logger",
+    "severity": "low",
+    "title": "Race condition caused duplicate charges in audit-logger",
+    "description": "Concurrent requests to audit-logger in prod bypassed idempotency checks under retry storms. Approximately 40 customers received duplicate charges.",
+    "resolution_summary": "Deployed distributed lock around payment intent creation and issued refunds for affected transactions.",
+    "tags": [
+      "api",
+      "database",
+      "deployment",
+      "error-rate"
+    ]
+  },
+  {
+    "id": "INC-00209",
+    "created_at": "2026-03-13T06:33:54Z",
+    "environment": "dev",
+    "service": "image-resizer",
+    "severity": "medium",
+    "title": "File upload failures on image-resizer storage backend",
+    "description": "Multipart uploads to image-resizer in dev failed with 403 errors. Object storage IAM policy changes blocked the service account used by the API tier.",
+    "resolution_summary": "Restored storage permissions and added policy diff checks to infrastructure CI before apply.",
+    "tags": [
+      "auth",
+      "config",
+      "storage"
+    ]
+  },
+  {
+    "id": "INC-00210",
+    "created_at": "2026-06-18T16:26:21Z",
+    "environment": "qa",
+    "service": "subscription-manager",
+    "severity": "low",
+    "title": "Email delivery backlog from subscription-manager",
+    "description": "Transactional emails from subscription-manager in qa queued for over six hours. Provider rate limits were exceeded during a marketing campaign overlap.",
+    "resolution_summary": "Throttled bulk sends, prioritized password-reset traffic, and negotiated temporary provider limit increase.",
+    "tags": [
+      "latency",
+      "queue",
+      "third-party"
+    ]
+  },
+  {
+    "id": "INC-00211",
+    "created_at": "2026-01-20T00:36:33Z",
+    "environment": "stage",
+    "service": "geo-routing-service",
+    "severity": "low",
+    "title": "geo-routing-service returning 503 errors in stage",
+    "description": "Users reported widespread failures when calling geo-routing-service. Error rate spiked to 31% in stage. Logs show upstream connection timeouts and circuit breaker trips.",
+    "resolution_summary": "Scaled geo-routing-service replicas and restarted unhealthy pods. Root cause was connection pool exhaustion under peak load.",
+    "tags": [
+      "api",
+      "error-rate",
+      "timeout"
+    ]
+  },
+  {
+    "id": "INC-00212",
+    "created_at": "2026-06-05T09:16:50Z",
+    "environment": "prod",
+    "service": "document-parser",
+    "severity": "medium",
+    "title": "Database connection pool exhausted on document-parser",
+    "description": "Monitoring alerted on document-parser in prod: all database connections in use. Queries queued and request latency exceeded 30 seconds.",
+    "resolution_summary": "Increased pool size and terminated long-running queries. Added index on hot table to reduce lock contention.",
+    "tags": [
+      "database",
+      "latency",
+      "storage",
+      "timeout"
+    ]
+  },
+  {
+    "id": "INC-00213",
+    "created_at": "2026-02-18T00:39:00Z",
+    "environment": "dev",
+    "service": "metrics-collector",
+    "severity": "low",
+    "title": "Authentication failures after metrics-collector deploy",
+    "description": "Following a deployment to dev, metrics-collector began rejecting valid tokens. Login success rate dropped sharply across regions.",
+    "resolution_summary": "Rolled back the deployment and rotated signing keys. Updated config validation to catch mismatched issuer URLs.",
+    "tags": [
+      "auth",
+      "config",
+      "cron",
+      "deployment"
+    ]
+  },
+  {
+    "id": "INC-00214",
+    "created_at": "2026-04-04T13:46:08Z",
+    "environment": "qa",
+    "service": "feature-flags-service",
+    "severity": "high",
+    "title": "Memory leak detected in feature-flags-service (qa)",
+    "description": "Heap usage on feature-flags-service climbed steadily over 48 hours in qa. OOM kills restarted pods every few hours.",
+    "resolution_summary": "Identified unclosed cache entries in recent release. Hotfixed memory cleanup and scheduled full redeploy.",
+    "tags": [
+      "api",
+      "deployment",
+      "memory",
+      "migration",
+      "networking"
+    ]
+  },
+  {
+    "id": "INC-00215",
+    "created_at": "2026-05-07T17:32:51Z",
+    "environment": "stage",
+    "service": "session-store",
+    "severity": "critical",
+    "title": "Redis cache miss storm impacting session-store",
+    "description": "session-store in stage experienced a cache stampede after TTL expiry. Database load surged and p99 latency degraded.",
+    "resolution_summary": "Enabled request coalescing and staggered cache TTLs. Warmed critical keys before peak traffic.",
+    "tags": [
+      "cache",
+      "database",
+      "latency"
+    ]
+  },
+  {
+    "id": "INC-00216",
+    "created_at": "2026-04-26T11:05:45Z",
+    "environment": "prod",
+    "service": "email-gateway",
+    "severity": "high",
+    "title": "SSL certificate expiry on email-gateway load balancer",
+    "description": "Clients could not reach email-gateway in prod due to an expired TLS certificate on the load balancer.",
+    "resolution_summary": "Renewed certificate and updated auto-renewal alerts. Verified chain trust across all edge nodes.",
+    "tags": [
+      "config",
+      "networking",
+      "ssl"
+    ]
+  },
+  {
+    "id": "INC-00217",
+    "created_at": "2026-02-22T03:10:51Z",
+    "environment": "dev",
+    "service": "payment-api",
+    "severity": "low",
+    "title": "Message queue backlog on payment-api",
+    "description": "Consumer lag on payment-api in dev exceeded one million messages. Downstream order processing stalled.",
+    "resolution_summary": "Scaled consumer workers and replayed dead-letter queue. Fixed poison message handler that blocked partition reads.",
+    "tags": [
+      "error-rate",
+      "latency",
+      "queue"
+    ]
+  },
+  {
+    "id": "INC-00218",
+    "created_at": "2026-05-15T06:32:45Z",
+    "environment": "qa",
+    "service": "user-auth",
+    "severity": "low",
+    "title": "Rate limiting misconfiguration on user-auth",
+    "description": "Legitimate traffic to user-auth in qa was throttled after a config change lowered rate limits too aggressively.",
+    "resolution_summary": "Restored previous rate limit thresholds and added staged rollout for gateway policy updates.",
+    "tags": [
+      "api",
+      "config",
+      "rate-limit"
+    ]
+  },
+  {
+    "id": "INC-00219",
+    "created_at": "2026-04-18T07:30:55Z",
+    "environment": "stage",
+    "service": "notification-service",
+    "severity": "low",
+    "title": "Disk space critical on notification-service nodes",
+    "description": "Several notification-service hosts in stage reached 98% disk usage. Log rotation failed and write operations began failing.",
+    "resolution_summary": "Expanded volumes and purged stale audit logs. Tuned log retention and added disk usage alerts.",
+    "tags": [
+      "deployment",
+      "disk",
+      "error-rate",
+      "kubernetes",
+      "queue"
+    ]
+  },
+  {
+    "id": "INC-00220",
+    "created_at": "2026-02-25T19:52:06Z",
+    "environment": "prod",
+    "service": "inventory-db",
+    "severity": "low",
+    "title": "Intermittent network partition affecting inventory-db",
+    "description": "inventory-db in prod lost connectivity to a dependency zone for 12 minutes. Retries caused retry storms across services.",
+    "resolution_summary": "Network team restored BGP routing. Added jittered backoff and bulkhead isolation between dependency calls.",
+    "tags": [
+      "api",
+      "cron",
+      "networking",
+      "timeout"
+    ]
+  },
+  {
+    "id": "INC-00221",
+    "created_at": "2026-02-15T12:18:31Z",
+    "environment": "dev",
+    "service": "checkout-frontend",
+    "severity": "high",
+    "title": "DNS resolution failures for checkout-frontend in dev",
+    "description": "Internal clients failed to resolve the checkout-frontend hostname in dev. Resolver timeouts caused cascading health check failures across dependent services.",
+    "resolution_summary": "Fixed stale NS records and reduced negative cache TTL. Added synthetic DNS probes to catch resolver drift early.",
+    "tags": [
+      "dns",
+      "failover",
+      "migration",
+      "monitoring",
+      "networking"
+    ]
+  },
+  {
+    "id": "INC-00222",
+    "created_at": "2026-03-04T03:24:22Z",
+    "environment": "qa",
+    "service": "order-processor",
+    "severity": "high",
+    "title": "Pod crash loop on order-processor after config rollout",
+    "description": "order-processor pods in qa entered CrashLoopBackOff after a config map update. Startup probes never passed and traffic shift stalled at 9% capacity.",
+    "resolution_summary": "Reverted config map and patched invalid environment variable references. Added schema validation to the deploy pipeline.",
+    "tags": [
+      "config",
+      "deployment",
+      "kubernetes",
+      "queue"
+    ]
+  },
+  {
+    "id": "INC-00223",
+    "created_at": "2026-03-05T10:07:30Z",
+    "environment": "stage",
+    "service": "search-indexer",
+    "severity": "medium",
+    "title": "Third-party API outage blocking search-indexer",
+    "description": "search-indexer in stage depends on an external vendor API that returned sustained 502 responses. Fallback logic did not activate and checkout flows failed.",
+    "resolution_summary": "Enabled degraded-mode responses and cached last-known-good data. Opened vendor ticket and documented failover runbook steps.",
+    "tags": [
+      "api",
+      "data-corruption",
+      "disk",
+      "failover",
+      "third-party"
+    ]
+  },
+  {
+    "id": "INC-00224",
+    "created_at": "2026-04-06T05:03:42Z",
+    "environment": "prod",
+    "service": "analytics-pipeline",
+    "severity": "low",
+    "title": "Suspected data corruption in analytics-pipeline records",
+    "description": "Support escalations reported inconsistent account states served by analytics-pipeline in prod. Audit sampling found mismatched version fields on 14% of recent writes.",
+    "resolution_summary": "Paused write path, restored from point-in-time backup, and replayed events through a repaired serializer.",
+    "tags": [
+      "data-corruption",
+      "database",
+      "kubernetes",
+      "rollback",
+      "ssl"
+    ]
+  },
+  {
+    "id": "INC-00225",
+    "created_at": "2026-06-06T15:14:39Z",
+    "environment": "dev",
+    "service": "cdn-edge",
+    "severity": "medium",
+    "title": "DDoS traffic spike targeting cdn-edge",
+    "description": "Edge metrics showed a 40\u00d7 increase in anonymous requests against cdn-edge in dev. Origin CPU saturated and legitimate users saw elevated error rates.",
+    "resolution_summary": "Activated WAF rules and geo-fenced suspicious ASNs. Scaled edge capacity and enabled challenge mode for abusive IPs.",
+    "tags": [
+      "config",
+      "ddos",
+      "dns",
+      "networking",
+      "saturation"
+    ]
+  },
+  {
+    "id": "INC-00226",
+    "created_at": "2026-05-24T22:34:41Z",
+    "environment": "qa",
+    "service": "billing-service",
+    "severity": "medium",
+    "title": "Feature flag misconfiguration in billing-service",
+    "description": "A flag rollout enabled experimental code for all tenants on billing-service in qa. Error dashboards spiked within minutes of the change.",
+    "resolution_summary": "Disabled the flag globally and restricted future rollouts to canary cohorts with automatic rollback thresholds.",
+    "tags": [
+      "config",
+      "deployment",
+      "error-rate"
+    ]
+  },
+  {
+    "id": "INC-00227",
+    "created_at": "2026-06-24T17:18:34Z",
+    "environment": "stage",
+    "service": "support-portal",
+    "severity": "low",
+    "title": "Schema migration timeout on support-portal database",
+    "description": "An online migration against support-portal in stage held table locks for over 20 minutes. Write traffic blocked and support tickets increased sharply.",
+    "resolution_summary": "Cancelled migration, applied changes in smaller batches, and scheduled remaining steps during a maintenance window.",
+    "tags": [
+      "api",
+      "database",
+      "latency",
+      "migration"
+    ]
+  },
+  {
+    "id": "INC-00228",
+    "created_at": "2026-05-26T10:36:00Z",
+    "environment": "prod",
+    "service": "mobile-backend",
+    "severity": "medium",
+    "title": "Log pipeline drop causing blind spots for mobile-backend",
+    "description": "Log shipping from mobile-backend in prod fell to near zero. On-call engineers lost visibility while customer-impacting errors continued.",
+    "resolution_summary": "Restarted log agents and increased buffer limits. Added alerts on ingest rate anomalies per service.",
+    "tags": [
+      "disk",
+      "monitoring",
+      "queue",
+      "rate-limit"
+    ]
+  },
+  {
+    "id": "INC-00229",
+    "created_at": "2026-01-16T16:31:26Z",
+    "environment": "dev",
+    "service": "fraud-detection",
+    "severity": "high",
+    "title": "Cold start latency regression on fraud-detection",
+    "description": "Serverless instances of fraud-detection in dev took up to 12 seconds to become ready. Autoscaling added capacity too slowly during a traffic burst.",
+    "resolution_summary": "Pre-warmed minimum instances and trimmed startup dependencies. Tuned autoscaling signals to react on queue depth.",
+    "tags": [
+      "deployment",
+      "latency",
+      "saturation"
+    ]
+  },
+  {
+    "id": "INC-00230",
+    "created_at": "2026-06-28T06:01:20Z",
+    "environment": "qa",
+    "service": "recommendation-engine",
+    "severity": "medium",
+    "title": "Webhook delivery failures from recommendation-engine",
+    "description": "recommendation-engine in qa failed to deliver outbound webhooks after TLS cipher policy tightened. Partner integrations missed 11% of expected callbacks.",
+    "resolution_summary": "Restored compatible cipher suites and retried failed deliveries from the dead-letter store with idempotency keys.",
+    "tags": [
+      "memory",
+      "ssl",
+      "third-party",
+      "webhook"
+    ]
+  },
+  {
+    "id": "INC-00231",
+    "created_at": "2026-05-29T18:49:56Z",
+    "environment": "stage",
+    "service": "webhook-dispatcher",
+    "severity": "low",
+    "title": "Session store unavailable for webhook-dispatcher",
+    "description": "Users were logged out repeatedly from webhook-dispatcher in stage. Session cluster nodes reported split-brain and rejected writes.",
+    "resolution_summary": "Forced quorum recovery, rebuilt replica set, and extended session TTL temporarily while caches repopulated.",
+    "tags": [
+      "auth",
+      "cache",
+      "failover"
+    ]
+  },
+  {
+    "id": "INC-00232",
+    "created_at": "2026-01-24T00:43:29Z",
+    "environment": "prod",
+    "service": "audit-logger",
+    "severity": "low",
+    "title": "CDN cache serving stale assets for audit-logger",
+    "description": "Customers saw outdated UI assets from audit-logger in prod. CDN purge jobs failed silently and edge nodes kept old bundles.",
+    "resolution_summary": "Issued manual global purge and fixed purge API credentials. Added post-deploy verification of asset hashes.",
+    "tags": [
+      "cache",
+      "config",
+      "deployment",
+      "saturation"
+    ]
+  },
+  {
+    "id": "INC-00233",
+    "created_at": "2026-05-10T12:35:57Z",
+    "environment": "dev",
+    "service": "image-resizer",
+    "severity": "medium",
+    "title": "Scheduled cron job failed on image-resizer",
+    "description": "A nightly reconciliation job for image-resizer in dev did not run for three days. Billing adjustments backlog grew to 26 thousand records.",
+    "resolution_summary": "Re-enabled cron scheduler after token expiry fix and backfilled missed runs with throttled batch workers.",
+    "tags": [
+      "cron",
+      "error-rate",
+      "queue",
+      "rate-limit",
+      "storage"
+    ]
+  },
+  {
+    "id": "INC-00234",
+    "created_at": "2026-06-24T00:11:54Z",
+    "environment": "qa",
+    "service": "subscription-manager",
+    "severity": "critical",
+    "title": "Secrets rotation broke subscription-manager credentials",
+    "description": "Automated secret rotation updated database credentials for subscription-manager in qa but running pods kept stale values. Connection errors spiked across all zones.",
+    "resolution_summary": "Triggered rolling restart after rotation and wired secret reload hooks into the deployment controller.",
+    "tags": [
+      "database",
+      "deployment",
+      "incident-response",
+      "secrets",
+      "webhook"
+    ]
+  },
+  {
+    "id": "INC-00235",
+    "created_at": "2026-05-11T05:05:45Z",
+    "environment": "stage",
+    "service": "geo-routing-service",
+    "severity": "low",
+    "title": "GraphQL N+1 query storm on geo-routing-service",
+    "description": "A new client release issued deeply nested GraphQL queries against geo-routing-service in stage. Database CPU hit 25% and API latency exceeded SLOs.",
+    "resolution_summary": "Added query cost limits and DataLoader batching for hot resolvers. Blocked offending client version at the gateway.",
+    "tags": [
+      "database",
+      "ddos",
+      "graphql",
+      "latency",
+      "rollback"
+    ]
+  },
+  {
+    "id": "INC-00236",
+    "created_at": "2026-01-22T18:51:49Z",
+    "environment": "prod",
+    "service": "document-parser",
+    "severity": "critical",
+    "title": "Load test accidentally run against document-parser in prod",
+    "description": "Engineering triggered a load test profile against live document-parser in prod. Synthetic traffic overwhelmed production pools and displaced real user sessions.",
+    "resolution_summary": "Stopped the test harness, restored traffic routing, and enforced environment guardrails in the load testing tool.",
+    "tags": [
+      "config",
+      "incident-response",
+      "saturation"
+    ]
+  },
+  {
+    "id": "INC-00237",
+    "created_at": "2026-06-03T12:11:00Z",
+    "environment": "dev",
+    "service": "metrics-collector",
+    "severity": "medium",
+    "title": "Timezone handling bug in metrics-collector reports",
+    "description": "Daily aggregation jobs for metrics-collector in dev shifted boundaries after DST change. Financial reports showed duplicate and missing transactions.",
+    "resolution_summary": "Patched timezone conversion to use UTC internally and rebuilt affected report partitions.",
+    "tags": [
+      "config",
+      "cron",
+      "data-corruption"
+    ]
+  },
+  {
+    "id": "INC-00238",
+    "created_at": "2026-06-06T03:34:46Z",
+    "environment": "qa",
+    "service": "feature-flags-service",
+    "severity": "low",
+    "title": "Race condition caused duplicate charges in feature-flags-service",
+    "description": "Concurrent requests to feature-flags-service in qa bypassed idempotency checks under retry storms. Approximately 11 customers received duplicate charges.",
+    "resolution_summary": "Deployed distributed lock around payment intent creation and issued refunds for affected transactions.",
+    "tags": [
+      "api",
+      "database",
+      "error-rate",
+      "failover",
+      "incident-response"
+    ]
+  },
+  {
+    "id": "INC-00239",
+    "created_at": "2026-02-10T19:18:57Z",
+    "environment": "stage",
+    "service": "session-store",
+    "severity": "critical",
+    "title": "File upload failures on session-store storage backend",
+    "description": "Multipart uploads to session-store in stage failed with 403 errors. Object storage IAM policy changes blocked the service account used by the API tier.",
+    "resolution_summary": "Restored storage permissions and added policy diff checks to infrastructure CI before apply.",
+    "tags": [
+      "auth",
+      "config",
+      "disk",
+      "storage",
+      "timeout"
+    ]
+  },
+  {
+    "id": "INC-00240",
+    "created_at": "2026-06-13T02:17:50Z",
+    "environment": "prod",
+    "service": "email-gateway",
+    "severity": "critical",
+    "title": "Email delivery backlog from email-gateway",
+    "description": "Transactional emails from email-gateway in prod queued for over six hours. Provider rate limits were exceeded during a marketing campaign overlap.",
+    "resolution_summary": "Throttled bulk sends, prioritized password-reset traffic, and negotiated temporary provider limit increase.",
+    "tags": [
+      "latency",
+      "queue",
+      "third-party"
+    ]
+  },
+  {
+    "id": "INC-00241",
+    "created_at": "2026-03-23T06:53:09Z",
+    "environment": "dev",
+    "service": "payment-api",
+    "severity": "medium",
+    "title": "payment-api returning 503 errors in dev",
+    "description": "Users reported widespread failures when calling payment-api. Error rate spiked to 27% in dev. Logs show upstream connection timeouts and circuit breaker trips.",
+    "resolution_summary": "Scaled payment-api replicas and restarted unhealthy pods. Root cause was connection pool exhaustion under peak load.",
+    "tags": [
+      "api",
+      "error-rate",
+      "networking",
+      "timeout"
+    ]
+  },
+  {
+    "id": "INC-00242",
+    "created_at": "2026-03-30T12:18:01Z",
+    "environment": "qa",
+    "service": "user-auth",
+    "severity": "high",
+    "title": "Database connection pool exhausted on user-auth",
+    "description": "Monitoring alerted on user-auth in qa: all database connections in use. Queries queued and request latency exceeded 30 seconds.",
+    "resolution_summary": "Increased pool size and terminated long-running queries. Added index on hot table to reduce lock contention.",
+    "tags": [
+      "database",
+      "latency",
+      "saturation",
+      "third-party",
+      "timeout"
+    ]
+  },
+  {
+    "id": "INC-00243",
+    "created_at": "2026-02-12T11:52:56Z",
+    "environment": "stage",
+    "service": "notification-service",
+    "severity": "high",
+    "title": "Authentication failures after notification-service deploy",
+    "description": "Following a deployment to stage, notification-service began rejecting valid tokens. Login success rate dropped sharply across regions.",
+    "resolution_summary": "Rolled back the deployment and rotated signing keys. Updated config validation to catch mismatched issuer URLs.",
+    "tags": [
+      "auth",
+      "config",
+      "deployment"
+    ]
+  },
+  {
+    "id": "INC-00244",
+    "created_at": "2026-05-22T03:38:16Z",
+    "environment": "prod",
+    "service": "inventory-db",
+    "severity": "low",
+    "title": "Memory leak detected in inventory-db (prod)",
+    "description": "Heap usage on inventory-db climbed steadily over 48 hours in prod. OOM kills restarted pods every few hours.",
+    "resolution_summary": "Identified unclosed cache entries in recent release. Hotfixed memory cleanup and scheduled full redeploy.",
+    "tags": [
+      "api",
+      "deployment",
+      "memory"
+    ]
+  },
+  {
+    "id": "INC-00245",
+    "created_at": "2026-02-06T06:58:36Z",
+    "environment": "dev",
+    "service": "checkout-frontend",
+    "severity": "low",
+    "title": "Redis cache miss storm impacting checkout-frontend",
+    "description": "checkout-frontend in dev experienced a cache stampede after TTL expiry. Database load surged and p99 latency degraded.",
+    "resolution_summary": "Enabled request coalescing and staggered cache TTLs. Warmed critical keys before peak traffic.",
+    "tags": [
+      "cache",
+      "database",
+      "latency"
+    ]
+  },
+  {
+    "id": "INC-00246",
+    "created_at": "2026-02-27T19:37:12Z",
+    "environment": "qa",
+    "service": "order-processor",
+    "severity": "low",
+    "title": "SSL certificate expiry on order-processor load balancer",
+    "description": "Clients could not reach order-processor in qa due to an expired TLS certificate on the load balancer.",
+    "resolution_summary": "Renewed certificate and updated auto-renewal alerts. Verified chain trust across all edge nodes.",
+    "tags": [
+      "config",
+      "error-rate",
+      "networking",
+      "ssl"
+    ]
+  },
+  {
+    "id": "INC-00247",
+    "created_at": "2026-07-03T11:56:25Z",
+    "environment": "stage",
+    "service": "search-indexer",
+    "severity": "critical",
+    "title": "Message queue backlog on search-indexer",
+    "description": "Consumer lag on search-indexer in stage exceeded one million messages. Downstream order processing stalled.",
+    "resolution_summary": "Scaled consumer workers and replayed dead-letter queue. Fixed poison message handler that blocked partition reads.",
+    "tags": [
+      "error-rate",
+      "latency",
+      "queue",
+      "third-party"
+    ]
+  },
+  {
+    "id": "INC-00248",
+    "created_at": "2026-04-05T06:36:35Z",
+    "environment": "prod",
+    "service": "analytics-pipeline",
+    "severity": "high",
+    "title": "Rate limiting misconfiguration on analytics-pipeline",
+    "description": "Legitimate traffic to analytics-pipeline in prod was throttled after a config change lowered rate limits too aggressively.",
+    "resolution_summary": "Restored previous rate limit thresholds and added staged rollout for gateway policy updates.",
+    "tags": [
+      "api",
+      "config",
+      "rate-limit",
+      "secrets"
+    ]
+  },
+  {
+    "id": "INC-00249",
+    "created_at": "2026-04-01T21:25:22Z",
+    "environment": "dev",
+    "service": "cdn-edge",
+    "severity": "medium",
+    "title": "Disk space critical on cdn-edge nodes",
+    "description": "Several cdn-edge hosts in dev reached 98% disk usage. Log rotation failed and write operations began failing.",
+    "resolution_summary": "Expanded volumes and purged stale audit logs. Tuned log retention and added disk usage alerts.",
+    "tags": [
+      "ddos",
+      "deployment",
+      "disk",
+      "error-rate",
+      "queue"
+    ]
+  },
+  {
+    "id": "INC-00250",
+    "created_at": "2026-03-25T04:48:01Z",
+    "environment": "qa",
+    "service": "billing-service",
+    "severity": "medium",
+    "title": "Intermittent network partition affecting billing-service",
+    "description": "billing-service in qa lost connectivity to a dependency zone for 12 minutes. Retries caused retry storms across services.",
+    "resolution_summary": "Network team restored BGP routing. Added jittered backoff and bulkhead isolation between dependency calls.",
+    "tags": [
+      "api",
+      "cache",
+      "networking",
+      "timeout"
+    ]
+  },
+  {
+    "id": "INC-00251",
+    "created_at": "2026-04-30T13:21:10Z",
+    "environment": "stage",
+    "service": "support-portal",
+    "severity": "high",
+    "title": "DNS resolution failures for support-portal in stage",
+    "description": "Internal clients failed to resolve the support-portal hostname in stage. Resolver timeouts caused cascading health check failures across dependent services.",
+    "resolution_summary": "Fixed stale NS records and reduced negative cache TTL. Added synthetic DNS probes to catch resolver drift early.",
+    "tags": [
+      "cron",
+      "dns",
+      "monitoring",
+      "networking"
+    ]
+  },
+  {
+    "id": "INC-00252",
+    "created_at": "2026-01-13T18:14:45Z",
+    "environment": "prod",
+    "service": "mobile-backend",
+    "severity": "medium",
+    "title": "Pod crash loop on mobile-backend after config rollout",
+    "description": "mobile-backend pods in prod entered CrashLoopBackOff after a config map update. Startup probes never passed and traffic shift stalled at 23% capacity.",
+    "resolution_summary": "Reverted config map and patched invalid environment variable references. Added schema validation to the deploy pipeline.",
+    "tags": [
+      "config",
+      "deployment",
+      "error-rate",
+      "kubernetes",
+      "rate-limit"
+    ]
+  },
+  {
+    "id": "INC-00253",
+    "created_at": "2026-06-26T11:30:22Z",
+    "environment": "dev",
+    "service": "fraud-detection",
+    "severity": "critical",
+    "title": "Third-party API outage blocking fraud-detection",
+    "description": "fraud-detection in dev depends on an external vendor API that returned sustained 502 responses. Fallback logic did not activate and checkout flows failed.",
+    "resolution_summary": "Enabled degraded-mode responses and cached last-known-good data. Opened vendor ticket and documented failover runbook steps.",
+    "tags": [
+      "api",
+      "failover",
+      "monitoring",
+      "rollback",
+      "third-party"
+    ]
+  },
+  {
+    "id": "INC-00254",
+    "created_at": "2026-06-03T04:45:14Z",
+    "environment": "qa",
+    "service": "recommendation-engine",
+    "severity": "critical",
+    "title": "Suspected data corruption in recommendation-engine records",
+    "description": "Support escalations reported inconsistent account states served by recommendation-engine in qa. Audit sampling found mismatched version fields on 43% of recent writes.",
+    "resolution_summary": "Paused write path, restored from point-in-time backup, and replayed events through a repaired serializer.",
+    "tags": [
+      "data-corruption",
+      "database",
+      "rollback",
+      "saturation"
+    ]
+  },
+  {
+    "id": "INC-00255",
+    "created_at": "2026-05-07T09:07:40Z",
+    "environment": "stage",
+    "service": "webhook-dispatcher",
+    "severity": "medium",
+    "title": "DDoS traffic spike targeting webhook-dispatcher",
+    "description": "Edge metrics showed a 19\u00d7 increase in anonymous requests against webhook-dispatcher in stage. Origin CPU saturated and legitimate users saw elevated error rates.",
+    "resolution_summary": "Activated WAF rules and geo-fenced suspicious ASNs. Scaled edge capacity and enabled challenge mode for abusive IPs.",
+    "tags": [
+      "ddos",
+      "latency",
+      "networking",
+      "saturation"
+    ]
+  },
+  {
+    "id": "INC-00256",
+    "created_at": "2026-02-27T04:00:19Z",
+    "environment": "prod",
+    "service": "audit-logger",
+    "severity": "high",
+    "title": "Feature flag misconfiguration in audit-logger",
+    "description": "A flag rollout enabled experimental code for all tenants on audit-logger in prod. Error dashboards spiked within minutes of the change.",
+    "resolution_summary": "Disabled the flag globally and restricted future rollouts to canary cohorts with automatic rollback thresholds.",
+    "tags": [
+      "config",
+      "deployment",
+      "error-rate",
+      "monitoring",
+      "rollback"
+    ]
+  },
+  {
+    "id": "INC-00257",
+    "created_at": "2026-01-28T08:49:00Z",
+    "environment": "dev",
+    "service": "image-resizer",
+    "severity": "high",
+    "title": "Schema migration timeout on image-resizer database",
+    "description": "An online migration against image-resizer in dev held table locks for over 20 minutes. Write traffic blocked and support tickets increased sharply.",
+    "resolution_summary": "Cancelled migration, applied changes in smaller batches, and scheduled remaining steps during a maintenance window.",
+    "tags": [
+      "api",
+      "database",
+      "latency",
+      "migration",
+      "storage"
+    ]
+  },
+  {
+    "id": "INC-00258",
+    "created_at": "2026-01-15T23:29:23Z",
+    "environment": "qa",
+    "service": "subscription-manager",
+    "severity": "medium",
+    "title": "Log pipeline drop causing blind spots for subscription-manager",
+    "description": "Log shipping from subscription-manager in qa fell to near zero. On-call engineers lost visibility while customer-impacting errors continued.",
+    "resolution_summary": "Restarted log agents and increased buffer limits. Added alerts on ingest rate anomalies per service.",
+    "tags": [
+      "config",
+      "disk",
+      "failover",
+      "monitoring",
+      "queue"
+    ]
+  },
+  {
+    "id": "INC-00259",
+    "created_at": "2026-07-05T03:10:22Z",
+    "environment": "stage",
+    "service": "geo-routing-service",
+    "severity": "high",
+    "title": "Cold start latency regression on geo-routing-service",
+    "description": "Serverless instances of geo-routing-service in stage took up to 12 seconds to become ready. Autoscaling added capacity too slowly during a traffic burst.",
+    "resolution_summary": "Pre-warmed minimum instances and trimmed startup dependencies. Tuned autoscaling signals to react on queue depth.",
+    "tags": [
+      "deployment",
+      "latency",
+      "saturation",
+      "ssl"
+    ]
+  },
+  {
+    "id": "INC-00260",
+    "created_at": "2026-02-17T11:46:17Z",
+    "environment": "prod",
+    "service": "document-parser",
+    "severity": "low",
+    "title": "Webhook delivery failures from document-parser",
+    "description": "document-parser in prod failed to deliver outbound webhooks after TLS cipher policy tightened. Partner integrations missed 16% of expected callbacks.",
+    "resolution_summary": "Restored compatible cipher suites and retried failed deliveries from the dead-letter store with idempotency keys.",
+    "tags": [
+      "ssl",
+      "third-party",
+      "webhook"
+    ]
+  },
+  {
+    "id": "INC-00261",
+    "created_at": "2026-04-16T22:31:59Z",
+    "environment": "dev",
+    "service": "metrics-collector",
+    "severity": "medium",
+    "title": "Session store unavailable for metrics-collector",
+    "description": "Users were logged out repeatedly from metrics-collector in dev. Session cluster nodes reported split-brain and rejected writes.",
+    "resolution_summary": "Forced quorum recovery, rebuilt replica set, and extended session TTL temporarily while caches repopulated.",
+    "tags": [
+      "auth",
+      "cache",
+      "data-corruption",
+      "failover"
+    ]
+  },
+  {
+    "id": "INC-00262",
+    "created_at": "2026-07-05T23:46:36Z",
+    "environment": "qa",
+    "service": "feature-flags-service",
+    "severity": "high",
+    "title": "CDN cache serving stale assets for feature-flags-service",
+    "description": "Customers saw outdated UI assets from feature-flags-service in qa. CDN purge jobs failed silently and edge nodes kept old bundles.",
+    "resolution_summary": "Issued manual global purge and fixed purge API credentials. Added post-deploy verification of asset hashes.",
+    "tags": [
+      "cache",
+      "config",
+      "deployment",
+      "saturation"
+    ]
+  },
+  {
+    "id": "INC-00263",
+    "created_at": "2026-06-14T15:59:43Z",
+    "environment": "stage",
+    "service": "session-store",
+    "severity": "medium",
+    "title": "Scheduled cron job failed on session-store",
+    "description": "A nightly reconciliation job for session-store in stage did not run for three days. Billing adjustments backlog grew to 26 thousand records.",
+    "resolution_summary": "Re-enabled cron scheduler after token expiry fix and backfilled missed runs with throttled batch workers.",
+    "tags": [
+      "cron",
+      "error-rate",
+      "queue"
+    ]
+  },
+  {
+    "id": "INC-00264",
+    "created_at": "2026-02-05T19:58:30Z",
+    "environment": "prod",
+    "service": "email-gateway",
+    "severity": "low",
+    "title": "Secrets rotation broke email-gateway credentials",
+    "description": "Automated secret rotation updated database credentials for email-gateway in prod but running pods kept stale values. Connection errors spiked across all zones.",
+    "resolution_summary": "Triggered rolling restart after rotation and wired secret reload hooks into the deployment controller.",
+    "tags": [
+      "database",
+      "deployment",
+      "secrets"
+    ]
+  },
+  {
+    "id": "INC-00265",
+    "created_at": "2026-03-21T12:38:07Z",
+    "environment": "dev",
+    "service": "payment-api",
+    "severity": "low",
+    "title": "GraphQL N+1 query storm on payment-api",
+    "description": "A new client release issued deeply nested GraphQL queries against payment-api in dev. Database CPU hit 40% and API latency exceeded SLOs.",
+    "resolution_summary": "Added query cost limits and DataLoader batching for hot resolvers. Blocked offending client version at the gateway.",
+    "tags": [
+      "database",
+      "graphql",
+      "latency"
+    ]
+  },
+  {
+    "id": "INC-00266",
+    "created_at": "2026-03-01T20:27:58Z",
+    "environment": "qa",
+    "service": "user-auth",
+    "severity": "low",
+    "title": "Load test accidentally run against user-auth in qa",
+    "description": "Engineering triggered a load test profile against live user-auth in qa. Synthetic traffic overwhelmed production pools and displaced real user sessions.",
+    "resolution_summary": "Stopped the test harness, restored traffic routing, and enforced environment guardrails in the load testing tool.",
+    "tags": [
+      "config",
+      "dns",
+      "incident-response",
+      "memory",
+      "saturation"
+    ]
+  },
+  {
+    "id": "INC-00267",
+    "created_at": "2026-05-03T00:14:50Z",
+    "environment": "stage",
+    "service": "notification-service",
+    "severity": "medium",
+    "title": "Timezone handling bug in notification-service reports",
+    "description": "Daily aggregation jobs for notification-service in stage shifted boundaries after DST change. Financial reports showed duplicate and missing transactions.",
+    "resolution_summary": "Patched timezone conversion to use UTC internally and rebuilt affected report partitions.",
+    "tags": [
+      "config",
+      "cron",
+      "data-corruption",
+      "saturation"
+    ]
+  },
+  {
+    "id": "INC-00268",
+    "created_at": "2026-05-20T12:57:58Z",
+    "environment": "prod",
+    "service": "inventory-db",
+    "severity": "medium",
+    "title": "Race condition caused duplicate charges in inventory-db",
+    "description": "Concurrent requests to inventory-db in prod bypassed idempotency checks under retry storms. Approximately 11 customers received duplicate charges.",
+    "resolution_summary": "Deployed distributed lock around payment intent creation and issued refunds for affected transactions.",
+    "tags": [
+      "api",
+      "database",
+      "error-rate"
+    ]
+  },
+  {
+    "id": "INC-00269",
+    "created_at": "2026-05-09T19:17:51Z",
+    "environment": "dev",
+    "service": "checkout-frontend",
+    "severity": "low",
+    "title": "File upload failures on checkout-frontend storage backend",
+    "description": "Multipart uploads to checkout-frontend in dev failed with 403 errors. Object storage IAM policy changes blocked the service account used by the API tier.",
+    "resolution_summary": "Restored storage permissions and added policy diff checks to infrastructure CI before apply.",
+    "tags": [
+      "auth",
+      "config",
+      "queue",
+      "secrets",
+      "storage"
+    ]
+  },
+  {
+    "id": "INC-00270",
+    "created_at": "2026-05-12T21:11:48Z",
+    "environment": "qa",
+    "service": "order-processor",
+    "severity": "high",
+    "title": "Email delivery backlog from order-processor",
+    "description": "Transactional emails from order-processor in qa queued for over six hours. Provider rate limits were exceeded during a marketing campaign overlap.",
+    "resolution_summary": "Throttled bulk sends, prioritized password-reset traffic, and negotiated temporary provider limit increase.",
+    "tags": [
+      "failover",
+      "latency",
+      "queue",
+      "third-party"
+    ]
+  },
+  {
+    "id": "INC-00271",
+    "created_at": "2026-02-01T03:44:57Z",
+    "environment": "stage",
+    "service": "search-indexer",
+    "severity": "medium",
+    "title": "search-indexer returning 503 errors in stage",
+    "description": "Users reported widespread failures when calling search-indexer. Error rate spiked to 31% in stage. Logs show upstream connection timeouts and circuit breaker trips.",
+    "resolution_summary": "Scaled search-indexer replicas and restarted unhealthy pods. Root cause was connection pool exhaustion under peak load.",
+    "tags": [
+      "api",
+      "error-rate",
+      "timeout"
+    ]
+  },
+  {
+    "id": "INC-00272",
+    "created_at": "2026-03-09T14:26:30Z",
+    "environment": "prod",
+    "service": "analytics-pipeline",
+    "severity": "critical",
+    "title": "Database connection pool exhausted on analytics-pipeline",
+    "description": "Monitoring alerted on analytics-pipeline in prod: all database connections in use. Queries queued and request latency exceeded 30 seconds.",
+    "resolution_summary": "Increased pool size and terminated long-running queries. Added index on hot table to reduce lock contention.",
+    "tags": [
+      "cache",
+      "database",
+      "latency",
+      "timeout"
+    ]
+  },
+  {
+    "id": "INC-00273",
+    "created_at": "2026-06-30T18:55:41Z",
+    "environment": "dev",
+    "service": "cdn-edge",
+    "severity": "critical",
+    "title": "Authentication failures after cdn-edge deploy",
+    "description": "Following a deployment to dev, cdn-edge began rejecting valid tokens. Login success rate dropped sharply across regions.",
+    "resolution_summary": "Rolled back the deployment and rotated signing keys. Updated config validation to catch mismatched issuer URLs.",
+    "tags": [
+      "auth",
+      "cache",
+      "config",
+      "deployment",
+      "dns"
+    ]
+  },
+  {
+    "id": "INC-00274",
+    "created_at": "2026-05-19T16:41:32Z",
+    "environment": "qa",
+    "service": "billing-service",
+    "severity": "low",
+    "title": "Memory leak detected in billing-service (qa)",
+    "description": "Heap usage on billing-service climbed steadily over 48 hours in qa. OOM kills restarted pods every few hours.",
+    "resolution_summary": "Identified unclosed cache entries in recent release. Hotfixed memory cleanup and scheduled full redeploy.",
+    "tags": [
+      "api",
+      "cron",
+      "deployment",
+      "failover",
+      "memory"
+    ]
+  },
+  {
+    "id": "INC-00275",
+    "created_at": "2026-06-02T15:13:27Z",
+    "environment": "stage",
+    "service": "support-portal",
+    "severity": "low",
+    "title": "Redis cache miss storm impacting support-portal",
+    "description": "support-portal in stage experienced a cache stampede after TTL expiry. Database load surged and p99 latency degraded.",
+    "resolution_summary": "Enabled request coalescing and staggered cache TTLs. Warmed critical keys before peak traffic.",
+    "tags": [
+      "cache",
+      "database",
+      "kubernetes",
+      "latency",
+      "networking"
+    ]
+  },
+  {
+    "id": "INC-00276",
+    "created_at": "2026-05-09T01:08:50Z",
+    "environment": "prod",
+    "service": "mobile-backend",
+    "severity": "critical",
+    "title": "SSL certificate expiry on mobile-backend load balancer",
+    "description": "Clients could not reach mobile-backend in prod due to an expired TLS certificate on the load balancer.",
+    "resolution_summary": "Renewed certificate and updated auto-renewal alerts. Verified chain trust across all edge nodes.",
+    "tags": [
+      "config",
+      "error-rate",
+      "networking",
+      "ssl"
+    ]
+  },
+  {
+    "id": "INC-00277",
+    "created_at": "2026-02-20T16:33:00Z",
+    "environment": "dev",
+    "service": "fraud-detection",
+    "severity": "critical",
+    "title": "Message queue backlog on fraud-detection",
+    "description": "Consumer lag on fraud-detection in dev exceeded one million messages. Downstream order processing stalled.",
+    "resolution_summary": "Scaled consumer workers and replayed dead-letter queue. Fixed poison message handler that blocked partition reads.",
+    "tags": [
+      "ddos",
+      "error-rate",
+      "latency",
+      "queue"
+    ]
+  },
+  {
+    "id": "INC-00278",
+    "created_at": "2026-01-28T19:01:33Z",
+    "environment": "qa",
+    "service": "recommendation-engine",
+    "severity": "high",
+    "title": "Rate limiting misconfiguration on recommendation-engine",
+    "description": "Legitimate traffic to recommendation-engine in qa was throttled after a config change lowered rate limits too aggressively.",
+    "resolution_summary": "Restored previous rate limit thresholds and added staged rollout for gateway policy updates.",
+    "tags": [
+      "api",
+      "config",
+      "cron",
+      "rate-limit",
+      "ssl"
+    ]
+  },
+  {
+    "id": "INC-00279",
+    "created_at": "2026-03-27T19:27:54Z",
+    "environment": "stage",
+    "service": "webhook-dispatcher",
+    "severity": "medium",
+    "title": "Disk space critical on webhook-dispatcher nodes",
+    "description": "Several webhook-dispatcher hosts in stage reached 98% disk usage. Log rotation failed and write operations began failing.",
+    "resolution_summary": "Expanded volumes and purged stale audit logs. Tuned log retention and added disk usage alerts.",
+    "tags": [
+      "auth",
+      "deployment",
+      "disk",
+      "error-rate"
+    ]
+  },
+  {
+    "id": "INC-00280",
+    "created_at": "2026-01-27T07:13:44Z",
+    "environment": "prod",
+    "service": "audit-logger",
+    "severity": "critical",
+    "title": "Intermittent network partition affecting audit-logger",
+    "description": "audit-logger in prod lost connectivity to a dependency zone for 12 minutes. Retries caused retry storms across services.",
+    "resolution_summary": "Network team restored BGP routing. Added jittered backoff and bulkhead isolation between dependency calls.",
+    "tags": [
+      "api",
+      "error-rate",
+      "networking",
+      "storage",
+      "timeout"
+    ]
+  },
+  {
+    "id": "INC-00281",
+    "created_at": "2026-06-11T06:43:42Z",
+    "environment": "dev",
+    "service": "image-resizer",
+    "severity": "critical",
+    "title": "DNS resolution failures for image-resizer in dev",
+    "description": "Internal clients failed to resolve the image-resizer hostname in dev. Resolver timeouts caused cascading health check failures across dependent services.",
+    "resolution_summary": "Fixed stale NS records and reduced negative cache TTL. Added synthetic DNS probes to catch resolver drift early.",
+    "tags": [
+      "dns",
+      "latency",
+      "monitoring",
+      "networking"
+    ]
+  },
+  {
+    "id": "INC-00282",
+    "created_at": "2026-02-18T08:19:38Z",
+    "environment": "qa",
+    "service": "subscription-manager",
+    "severity": "high",
+    "title": "Pod crash loop on subscription-manager after config rollout",
+    "description": "subscription-manager pods in qa entered CrashLoopBackOff after a config map update. Startup probes never passed and traffic shift stalled at 41% capacity.",
+    "resolution_summary": "Reverted config map and patched invalid environment variable references. Added schema validation to the deploy pipeline.",
+    "tags": [
+      "config",
+      "deployment",
+      "kubernetes"
+    ]
+  },
+  {
+    "id": "INC-00283",
+    "created_at": "2026-02-20T10:24:22Z",
+    "environment": "stage",
+    "service": "geo-routing-service",
+    "severity": "high",
+    "title": "Third-party API outage blocking geo-routing-service",
+    "description": "geo-routing-service in stage depends on an external vendor API that returned sustained 502 responses. Fallback logic did not activate and checkout flows failed.",
+    "resolution_summary": "Enabled degraded-mode responses and cached last-known-good data. Opened vendor ticket and documented failover runbook steps.",
+    "tags": [
+      "api",
+      "failover",
+      "third-party"
+    ]
+  },
+  {
+    "id": "INC-00284",
+    "created_at": "2026-06-11T15:20:46Z",
+    "environment": "prod",
+    "service": "document-parser",
+    "severity": "medium",
+    "title": "Suspected data corruption in document-parser records",
+    "description": "Support escalations reported inconsistent account states served by document-parser in prod. Audit sampling found mismatched version fields on 14% of recent writes.",
+    "resolution_summary": "Paused write path, restored from point-in-time backup, and replayed events through a repaired serializer.",
+    "tags": [
+      "data-corruption",
+      "database",
+      "error-rate",
+      "rollback",
+      "timeout"
+    ]
+  },
+  {
+    "id": "INC-00285",
+    "created_at": "2026-04-24T09:35:11Z",
+    "environment": "dev",
+    "service": "metrics-collector",
+    "severity": "high",
+    "title": "DDoS traffic spike targeting metrics-collector",
+    "description": "Edge metrics showed a 13\u00d7 increase in anonymous requests against metrics-collector in dev. Origin CPU saturated and legitimate users saw elevated error rates.",
+    "resolution_summary": "Activated WAF rules and geo-fenced suspicious ASNs. Scaled edge capacity and enabled challenge mode for abusive IPs.",
+    "tags": [
+      "ddos",
+      "networking",
+      "rollback",
+      "saturation"
+    ]
+  },
+  {
+    "id": "INC-00286",
+    "created_at": "2026-05-17T20:45:06Z",
+    "environment": "qa",
+    "service": "feature-flags-service",
+    "severity": "high",
+    "title": "Feature flag misconfiguration in feature-flags-service",
+    "description": "A flag rollout enabled experimental code for all tenants on feature-flags-service in qa. Error dashboards spiked within minutes of the change.",
+    "resolution_summary": "Disabled the flag globally and restricted future rollouts to canary cohorts with automatic rollback thresholds.",
+    "tags": [
+      "config",
+      "deployment",
+      "error-rate"
+    ]
+  },
+  {
+    "id": "INC-00287",
+    "created_at": "2026-03-20T01:31:48Z",
+    "environment": "stage",
+    "service": "session-store",
+    "severity": "high",
+    "title": "Schema migration timeout on session-store database",
+    "description": "An online migration against session-store in stage held table locks for over 20 minutes. Write traffic blocked and support tickets increased sharply.",
+    "resolution_summary": "Cancelled migration, applied changes in smaller batches, and scheduled remaining steps during a maintenance window.",
+    "tags": [
+      "database",
+      "latency",
+      "migration"
+    ]
+  },
+  {
+    "id": "INC-00288",
+    "created_at": "2026-02-12T08:02:46Z",
+    "environment": "prod",
+    "service": "email-gateway",
+    "severity": "medium",
+    "title": "Log pipeline drop causing blind spots for email-gateway",
+    "description": "Log shipping from email-gateway in prod fell to near zero. On-call engineers lost visibility while customer-impacting errors continued.",
+    "resolution_summary": "Restarted log agents and increased buffer limits. Added alerts on ingest rate anomalies per service.",
+    "tags": [
+      "database",
+      "disk",
+      "monitoring",
+      "queue"
+    ]
+  },
+  {
+    "id": "INC-00289",
+    "created_at": "2026-04-21T15:44:10Z",
+    "environment": "dev",
+    "service": "payment-api",
+    "severity": "high",
+    "title": "Cold start latency regression on payment-api",
+    "description": "Serverless instances of payment-api in dev took up to 12 seconds to become ready. Autoscaling added capacity too slowly during a traffic burst.",
+    "resolution_summary": "Pre-warmed minimum instances and trimmed startup dependencies. Tuned autoscaling signals to react on queue depth.",
+    "tags": [
+      "deployment",
+      "latency",
+      "saturation"
+    ]
+  },
+  {
+    "id": "INC-00290",
+    "created_at": "2026-04-06T13:06:50Z",
+    "environment": "qa",
+    "service": "user-auth",
+    "severity": "critical",
+    "title": "Webhook delivery failures from user-auth",
+    "description": "user-auth in qa failed to deliver outbound webhooks after TLS cipher policy tightened. Partner integrations missed 35% of expected callbacks.",
+    "resolution_summary": "Restored compatible cipher suites and retried failed deliveries from the dead-letter store with idempotency keys.",
+    "tags": [
+      "ddos",
+      "ssl",
+      "third-party",
+      "webhook"
+    ]
+  },
+  {
+    "id": "INC-00291",
+    "created_at": "2026-04-17T08:03:30Z",
+    "environment": "stage",
+    "service": "notification-service",
+    "severity": "critical",
+    "title": "Session store unavailable for notification-service",
+    "description": "Users were logged out repeatedly from notification-service in stage. Session cluster nodes reported split-brain and rejected writes.",
+    "resolution_summary": "Forced quorum recovery, rebuilt replica set, and extended session TTL temporarily while caches repopulated.",
+    "tags": [
+      "auth",
+      "cache",
+      "failover"
+    ]
+  },
+  {
+    "id": "INC-00292",
+    "created_at": "2026-03-09T01:41:57Z",
+    "environment": "prod",
+    "service": "inventory-db",
+    "severity": "critical",
+    "title": "CDN cache serving stale assets for inventory-db",
+    "description": "Customers saw outdated UI assets from inventory-db in prod. CDN purge jobs failed silently and edge nodes kept old bundles.",
+    "resolution_summary": "Issued manual global purge and fixed purge API credentials. Added post-deploy verification of asset hashes.",
+    "tags": [
+      "cache",
+      "config",
+      "deployment",
+      "storage"
+    ]
+  },
+  {
+    "id": "INC-00293",
+    "created_at": "2026-04-12T12:13:02Z",
+    "environment": "dev",
+    "service": "checkout-frontend",
+    "severity": "critical",
+    "title": "Scheduled cron job failed on checkout-frontend",
+    "description": "A nightly reconciliation job for checkout-frontend in dev did not run for three days. Billing adjustments backlog grew to 8 thousand records.",
+    "resolution_summary": "Re-enabled cron scheduler after token expiry fix and backfilled missed runs with throttled batch workers.",
+    "tags": [
+      "cron",
+      "dns",
+      "error-rate",
+      "queue"
+    ]
+  },
+  {
+    "id": "INC-00294",
+    "created_at": "2026-05-27T20:01:50Z",
+    "environment": "qa",
+    "service": "order-processor",
+    "severity": "critical",
+    "title": "Secrets rotation broke order-processor credentials",
+    "description": "Automated secret rotation updated database credentials for order-processor in qa but running pods kept stale values. Connection errors spiked across all zones.",
+    "resolution_summary": "Triggered rolling restart after rotation and wired secret reload hooks into the deployment controller.",
+    "tags": [
+      "database",
+      "deployment",
+      "memory",
+      "secrets"
+    ]
+  },
+  {
+    "id": "INC-00295",
+    "created_at": "2026-05-07T14:52:17Z",
+    "environment": "stage",
+    "service": "search-indexer",
+    "severity": "critical",
+    "title": "GraphQL N+1 query storm on search-indexer",
+    "description": "A new client release issued deeply nested GraphQL queries against search-indexer in stage. Database CPU hit 25% and API latency exceeded SLOs.",
+    "resolution_summary": "Added query cost limits and DataLoader batching for hot resolvers. Blocked offending client version at the gateway.",
+    "tags": [
+      "database",
+      "graphql",
+      "latency"
+    ]
+  },
+  {
+    "id": "INC-00296",
+    "created_at": "2026-03-03T21:40:02Z",
+    "environment": "prod",
+    "service": "analytics-pipeline",
+    "severity": "critical",
+    "title": "Load test accidentally run against analytics-pipeline in prod",
+    "description": "Engineering triggered a load test profile against live analytics-pipeline in prod. Synthetic traffic overwhelmed production pools and displaced real user sessions.",
+    "resolution_summary": "Stopped the test harness, restored traffic routing, and enforced environment guardrails in the load testing tool.",
+    "tags": [
+      "config",
+      "incident-response",
+      "saturation",
+      "secrets",
+      "webhook"
+    ]
+  },
+  {
+    "id": "INC-00297",
+    "created_at": "2026-05-05T12:02:52Z",
+    "environment": "dev",
+    "service": "cdn-edge",
+    "severity": "medium",
+    "title": "Timezone handling bug in cdn-edge reports",
+    "description": "Daily aggregation jobs for cdn-edge in dev shifted boundaries after DST change. Financial reports showed duplicate and missing transactions.",
+    "resolution_summary": "Patched timezone conversion to use UTC internally and rebuilt affected report partitions.",
+    "tags": [
+      "config",
+      "cron",
+      "data-corruption",
+      "dns",
+      "error-rate"
+    ]
+  },
+  {
+    "id": "INC-00298",
+    "created_at": "2026-06-12T12:05:44Z",
+    "environment": "qa",
+    "service": "billing-service",
+    "severity": "low",
+    "title": "Race condition caused duplicate charges in billing-service",
+    "description": "Concurrent requests to billing-service in qa bypassed idempotency checks under retry storms. Approximately 11 customers received duplicate charges.",
+    "resolution_summary": "Deployed distributed lock around payment intent creation and issued refunds for affected transactions.",
+    "tags": [
+      "api",
+      "cache",
+      "database",
+      "error-rate",
+      "incident-response"
+    ]
+  },
+  {
+    "id": "INC-00299",
+    "created_at": "2026-04-07T04:23:54Z",
+    "environment": "stage",
+    "service": "support-portal",
+    "severity": "high",
+    "title": "File upload failures on support-portal storage backend",
+    "description": "Multipart uploads to support-portal in stage failed with 403 errors. Object storage IAM policy changes blocked the service account used by the API tier.",
+    "resolution_summary": "Restored storage permissions and added policy diff checks to infrastructure CI before apply.",
+    "tags": [
+      "auth",
+      "config",
+      "storage"
+    ]
+  },
+  {
+    "id": "INC-00300",
+    "created_at": "2026-06-19T04:03:11Z",
+    "environment": "prod",
+    "service": "mobile-backend",
+    "severity": "low",
+    "title": "Email delivery backlog from mobile-backend",
+    "description": "Transactional emails from mobile-backend in prod queued for over six hours. Provider rate limits were exceeded during a marketing campaign overlap.",
+    "resolution_summary": "Throttled bulk sends, prioritized password-reset traffic, and negotiated temporary provider limit increase.",
+    "tags": [
+      "latency",
+      "queue",
+      "rate-limit",
+      "third-party"
+    ]
+  }
+]

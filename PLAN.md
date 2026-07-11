@@ -17,16 +17,16 @@ Checklist for building the incident triage search + AI assistant. Each item maps
 
 ## Data generation
 
-- [ ] Create `generate_data.py` with fixed seed (`SEED = 42`) for repeatable output — **Data: fixed seed**
-- [ ] Generate exactly 300 synthetic incidents with fields: `id`, `created_at`, `environment`, `service`, `severity`, `title`, `description`, `resolution_summary`, `tags` — **Data: 200–500 tickets, required fields**
-- [ ] Use `environment` values from `dev` / `qa` / `stage` / `prod` — **Data: environment enum**
-- [ ] Use `severity` enum: `critical`, `high`, `medium`, `low` — **Design decision: severity enum**
-- [ ] Set `created_at` as ISO 8601 UTC, randomly spread over the last 6 months — **Design decision: created_at format**
-- [ ] Store `tags` as a JSON array of strings — **Data: tags (array)**
-- [ ] Write output to `data/incidents.json` — **Design decision: generate once, write to file**
-- [ ] Skip generation with a message if `data/incidents.json` already exists — **Design decision: skip if file exists**
-- [ ] Pre-generate and commit `data/incidents.json` to the repo — **Design decision: pre-generated and committed**
-- [ ] Document `python generate_data.py` in README (run once if file missing) — **Docs: how to start / ingest prep**
+- [x] Create `generate_data.py` with fixed seed (`SEED = 42`) for repeatable output — **Data: fixed seed**
+- [x] Generate exactly 300 synthetic incidents with fields: `id`, `created_at`, `environment`, `service`, `severity`, `title`, `description`, `resolution_summary`, `tags` — **Data: 200–500 tickets, required fields**
+- [x] Use `environment` values from `dev` / `qa` / `stage` / `prod` — **Data: environment enum**
+- [x] Use `severity` enum: `critical`, `high`, `medium`, `low` — **Design decision: severity enum**
+- [x] Set `created_at` as ISO 8601 UTC, randomly spread over the last 6 months — **Design decision: created_at format**
+- [x] Store `tags` as a JSON array of strings — **Data: tags (array)**
+- [x] Write output to `data/incidents.json` — **Design decision: generate once, write to file**
+- [x] Skip generation with a message if `data/incidents.json` already exists — **Design decision: skip if file exists**
+- [x] Pre-generate and commit `data/incidents.json` to the repo — **Design decision: pre-generated and committed**
+- [x] Document `python generate_data.py` in README (run once if file missing) — **Docs: how to start / ingest prep**
 - [ ] **Commit checkpoint:** data generator and pre-generated incidents
 
 ---
