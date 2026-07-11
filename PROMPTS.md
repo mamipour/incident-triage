@@ -1,5 +1,15 @@
-PROMPT #1
+# PROMPTS.md
 
+---
+
+## Prompt #1
+
+**Tool used:** Cursor (Composer 2)
+
+**Goal:** Make the agent ask questions before touching any code, catch spec gaps early
+
+**Prompt:**
+```
 Read the spec at @SPECS.md carefully.
 Before writing any code:
 - Ask any clarifying questions about requirements that are ambiguous
@@ -7,12 +17,26 @@ Before writing any code:
 - Point out anything that could cause problems during implementation
 Do not write any code yet. Questions and concerns only.
 Do not create or modify PROMPTS.md, AI-NOTES.md, or TRADEOFFS.md.
+```
 
+**Result summary:** Agent asked ~8 questions on data count, idempotency strategy, FTS scoring, filter behavior (AND vs OR), LLM provider
 
+**What you kept:** All questions - they were on point
 
+**What you changed manually:** Nothing - used the answers as input for Prompt #2
 
-PROMPT #2
+**Follow-up prompt:** Prompt #2 (answered all questions)
 
+---
+
+## Prompt #2
+
+**Tool used:** Cursor (Composer 2)
+
+**Goal:** Answer all the agent's questions at once, lock in all design decisions before a line of code is written
+
+**Prompt:**
+```
 Data:
 Count: 300 exactly
 Generator vs file: generate once, write to data/incidents.json, ingest always reads from that file. Ingest does not run the generator everytime. those are separated functionalities.
@@ -35,11 +59,10 @@ Score: raw FTS5 rank negated so higher = better match
 Snippet: first 150 chars of description, plain text, no highlighting
 Empty/whitespace q: Reject with 422 code
 
-
-Assist
+Assist:
 question field becomes the FTS query directly, no separate construction step
 Candidate pool: 10 (same as search)
-LLM selects 3–5 from the candidates it receives
+LLM selects 3-5 from the candidates it receives
 Response schema:
 {
   "relevant_incidents": [{"id": "...", "reason": "..."}],
@@ -50,23 +73,35 @@ Response schema:
 "Nothing relevant": zero search hits = return 200 with "message": "No relevant incidents found. Please refine your question." and LLM never gets called
 LLM failure: 503 with {"error": "...", "detail": "Set LLM_API_KEY. See README.", "correlation_id": "..."}
 
-
-
 Observability:
 Header: X-Correlation-ID, echoed in every response
 Trace recording: /assist steps only, but correlation_id on all log lines
 Trace storage: in-memory dict, max 100 entries (drop oldest), 404 for unknown IDs
 Log format: structured JSON
 
-
 LLM:
 OpenAI only, no multi-provider needed
 temperature: 0, timeout: 30s, max_tokens: 1000
+```
 
+**Result summary:** Agent acknowledged all decisions and ready for the plan
 
+**What you kept:** Everything
 
-PROMPT #3:
+**What you changed manually:** Nothing - this was me writing the spec decisions, not the agent
 
+**Follow-up prompt:** Prompt #3
+
+---
+
+## Prompt #3
+
+**Tool used:** Cursor (Composer 2)
+
+**Goal:** Generate PLAN.md from the design decisions
+
+**Prompt:**
+```
 1- Option A
 2- Tags are metadata filters only. A search for q=timeout matches on text fields
 3- Proposition is fine
@@ -76,96 +111,138 @@ PROMPT #3:
 7- Proposition is fine
 8- Drop
 
-Now write PLAN.md as a GitHub-flavoured markdown checklist, one task per line, each mapped to the requirement it satisfies. Do not write any code yet. 
+Now write PLAN.md as a GitHub-flavoured markdown checklist, one task per line, each mapped to the requirement it satisfies. Do not write any code yet.
 We will start iterating over the plan after I review it.
+```
 
+**Result summary:** 62-item checklist across 10 sections, each item mapped to a requirement
 
-PROPMT #4:
+**What you kept:** Most of it
+
+**What you changed manually:** Three things - see Prompt #4
+
+**Follow-up prompt:** Prompt #4
+
+---
+
+## Prompt #4
+
+**Tool used:** Cursor (Composer 2)
+
+**Goal:** Fix 3 gaps in the plan before coding starts
+
+**Prompt:**
+```
 Plan looks good, three things to fix before we start:
 
-1. Add a prompt injection check task in Assist section. It should be an isolated function, keyword-based for now, returns 422 if triggered. 
+1. Add a prompt injection check task in Assist section. It should be an isolated function, keyword-based for now, returns 422 if triggered.
 
 2. Update the "Prompt LLM" item, change "retrieved incident records only" to "retrieved incident records framed as data not instructions". It is for preventing indirect prompt injections.
 
 3. Add a commit checkpoint at the end of each section.
 
 Update PLAN.md, no code yet.
+```
 
+**Result summary:** PLAN.md updated with all 3 changes
 
-PROMPT #5:
-I fixed the .env permissions, set it to 600. Confirm if it's ok now
-Do not move forward yet
+**What you kept:** Everything
 
+**What you changed manually:** Nothing
 
-PROMPT #6:
-Looks good, committed. Start section 2. Do it completely, then stop and wait for me to review.
+**Follow-up prompt:** Start section 1
 
-PROMPT #7:
-10 scenarios cycling across 300 records makes the data too repetitive. 
-Add 20 more scenarios, extend SERVICES and TAGS_POOL too. 
+---
+
+## Prompt #7
+
+**Tool used:** Cursor (Composer 2)
+
+**Goal:** Fix repetitive data - 10 scenarios for 300 records is too uniform, search results and LLM output won't be interesting
+
+**Prompt:**
+```
+10 scenarios cycling across 300 records makes the data too repetitive.
+Add 20 more scenarios, extend SERVICES and TAGS_POOL too.
 Regenerate the file when done and ask me to review.
+```
 
+**Result summary:** 30 scenarios, 24 services, 31 tags. Better variety.
 
-PROMPT #8:
-Committed. Start only section 3. Then stop and wait for me to review.
+**What you kept:** The extended generator and regenerated incidents.json
 
+**What you changed manually:** Nothing in code - checked the distribution manually after regeneration
 
-PROMPT #9:
-Why did you include content_hash in row_to_incident? 
-It is an internal field and exposing it it not the best practice.
-Will removing it break anything downstream? 
+**Note:** I caught this by reviewing the output. Agent didn't flag it.
+
+---
+
+## Prompt #9
+
+**Tool used:** Cursor (Composer 2)
+
+**Goal:** Understand why content_hash was in the public API response before removing it
+
+**Prompt:**
+```
+Why did you include content_hash in row_to_incident?
+It is an internal field and exposing it is not the best practice.
+Will removing it break anything downstream?
 Do not remove it yet, just explain.
+```
 
+**Result summary:** Agent explained it pulled the full DB row by default. Confirmed removing it is safe - ingest reads it from the raw row directly.
 
-PROMPT #10:
+**What you kept:** The explanation
+
+**What you changed manually:** Nothing - followed with a separate prompt to remove it
+
+**Follow-up prompt:**
+```
 Remove content_hash from row_to_incident then. Ingest will read it from the row directly.
 Then stop and do not move forward to the next section.
+```
 
+---
 
+## Prompt #15
 
-PROPMT #11:
-Committed. Start only section 4. Then stop and wait for me to review.
+**Tool used:** Cursor (Composer 2)
 
+**Goal:** Agent said section 6 was done but tests/ was empty
 
-PROMPT #12:
-SearchResultItem is missing environment, service, severity, tags
-My review is not done yet, just fix this one and stop.
+**Prompt:**
+```
+tests/ is empty. The plan says write search filter tests alongside the search module.
+```
 
+**Result summary:** Agent wrote 11 unit tests covering query building, filter clauses, score ordering, and snippet generation
 
-PROMPT #13:
-Committed. Start only section 5. Then stop and wait for me to review.
+**What you kept:** All 11 tests
 
+**What you changed manually:** Nothing
 
-PROMPT #14:
-Committed. Start only section 6. Then stop and wait for me to review.
+**Note:** Agent had run terminal checks, not written test files. Always verify the output, not just the claim.
 
+---
 
-PROMPT #15:
-tests/ is empty. The plan says write search filter tests alongside the search module. 
+## Prompt #18
 
+**Tool used:** Cursor (Composer 2)
 
-PROMPT #16:
-Committed. Start only section 7. Then stop and wait for me to review.
+**Goal:** Fix a spec requirement missed at plan stage and at code review
 
-
-PROMPT #17:
-Committed. Start only section 8. Then stop and wait for me to review.
-
-
-PROMPT #18:
+**Prompt:**
+```
 Confirm then fix
-SPECS.md  says: "If nothing relevant is found, say so and ask for more info." 
+SPECS.md says: "If nothing relevant is found, say so and ask for more info."
 The system prompt in assist_service.py is missing this explicit instruction. Add it.
+```
 
+**Result summary:** Agent confirmed the gap and added the instruction to the system prompt
 
-PROMPT #19:
-Committed. Start only section 9. Then stop and wait for me to review.
+**What you kept:** The fix
 
-PROMPT #20:
-Committed. Start only section 10. Then stop and wait for me to review.
+**What you changed manually:** Nothing
 
-PROMPT #21:
-Committed. Start only section 11. Then stop and wait for me to review.
-
-PROMPT #22:
-Committed. Start only section 12. Then stop and wait for me to review.
+**Note:** Agent missed it writing PLAN.md, I missed it reviewing the plan. Caught it by re-reading the spec.
