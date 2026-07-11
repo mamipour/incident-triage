@@ -123,9 +123,9 @@ Checklist for building the incident triage search + AI assistant. Each item maps
 
 ## Testing
 
-- [ ] Add unit test for search query building (token AND) and filter combination (AND filters, tags OR) — **Testing: query building and filtering**
-- [ ] Add unit test for assist guardrails (cited IDs in candidate set, rejection of invented details) — **Testing: guardrails**
-- [ ] Do not add integration tests — **Testing: integration tests not needed**
+- [x] Add unit test for search query building (token AND) and filter combination (AND filters, tags OR) — **Testing: query building and filtering**
+- [x] Add unit test for assist guardrails (cited IDs in candidate set, rejection of invented details) — **Testing: guardrails**
+- [x] Do not add integration tests — **Testing: integration tests not needed**
 - [ ] **Commit checkpoint:** unit tests
 
 ---
