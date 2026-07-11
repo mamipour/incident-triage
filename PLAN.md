@@ -144,8 +144,8 @@ Checklist for building the incident triage search + AI assistant. Each item maps
 
 ## Final verification
 
-- [ ] Manually verify ingest → search → assist → trace flow end-to-end — **API requirements (all endpoints)**
-- [ ] Confirm idempotent ingest: second run reports all skipped — **POST /ingest: idempotent**
-- [ ] Confirm `/assist` returns 503 with helpful detail when `LLM_API_KEY` is missing — **Grounding: LLM failure error**
-- [ ] Do not create or modify `PROMPTS.md`, `AI-NOTES.md`, or `TRADEOFFS.md` — **SPECS.md: IMPORTANT constraint**
+- [x] Manually verify ingest → search → assist → trace flow end-to-end — **API requirements (all endpoints)**
+- [x] Confirm idempotent ingest: second run reports all skipped — **POST /ingest: idempotent**
+- [x] Confirm `/assist` returns 503 with helpful detail when `LLM_API_KEY` is missing — **Grounding: LLM failure error**
+- [x] Do not create or modify `PROMPTS.md`, `AI-NOTES.md`, or `TRADEOFFS.md` — **SPECS.md: IMPORTANT constraint**
 - [ ] **Commit checkpoint:** final verification pass
