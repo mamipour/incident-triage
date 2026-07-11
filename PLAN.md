@@ -45,10 +45,10 @@ Checklist for building the incident triage search + AI assistant. Each item maps
 
 ## Domain models and validation
 
-- [ ] Define Pydantic models for incident record, ingest response, search response, assist request/response, and error payloads — **Robustness: input validation**
-- [ ] Validate `environment`, `service`, `severity`, and comma-separated `tags` on search and assist filters — **GET /search, POST /assist: optional filters**
-- [ ] Reject empty or whitespace-only `q` on `/search` with HTTP 422 — **Design decision: empty q → 422**
-- [ ] Validate `question` on `/assist`: required, max 1000 characters — **POST /assist: question max 1000 chars; Robustness: limits**
+- [x] Define Pydantic models for incident record, ingest response, search response, assist request/response, and error payloads — **Robustness: input validation**
+- [x] Validate `environment`, `service`, `severity`, and comma-separated `tags` on search and assist filters — **GET /search, POST /assist: optional filters**
+- [x] Reject empty or whitespace-only `q` on `/search` with HTTP 422 — **Design decision: empty q → 422**
+- [x] Validate `question` on `/assist`: required, max 1000 characters — **POST /assist: question max 1000 chars; Robustness: limits**
 - [ ] **Commit checkpoint:** Pydantic models and input validation
 
 ---
